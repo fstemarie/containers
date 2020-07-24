@@ -1,0 +1,66 @@
+version: "2"
+services:
+  qbittorrent:
+    image: linuxserver/qbittorrent
+    container_name: qbittorrent
+    environment:
+      - PUID=993
+      - PGID=1000
+      - TZ=America/Toronto
+      - UMASK_SET=022
+      - WEBUI_PORT=8080
+    volumes:
+      - /containers/qbittorrent/config:/config
+      - /sharedfolders/Downloads:/downloads
+    ports:
+      - 6881:6881
+      - 6881:6881/udp
+      - 8080:8080
+    restart: unless-stopped
+
+  jackett:
+    image: linuxserver/jackett
+    container_name: jackett
+    environment:
+      - PUID=992
+      - PGID=1000
+      - TZ=America/Toronto
+      - AUTO_UPDATE=true #optional
+      #- RUN_OPTS=run options here #optional
+    volumes:
+      - /containers/jackett/config:/config
+    ports:
+      - 9117:9117
+    restart: unless-stopped
+
+  radarr:
+    image: linuxserver/radarr
+    container_name: radarr
+    environment:
+      - PUID=997
+      - PGID=1000
+      - TZ=America/Toronto
+      - UMASK_SET=022 #optional
+    volumes:
+      - /containers/radarr/config:/config
+      - /sharedfolders/Movies:/movies
+      - /sharedfolders/Downloads:/downloads
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+    
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    environment:
+      - PUID=996
+      - PGID=1000
+      - TZ=America/Toronto
+      - UMASK_SET=022 #optional
+    volumes:
+      - /containers/sonarr/config:/config
+      - /sharedfolders/tvshows:/tv
+      - /sharedfolders/Downloads:/downloads
+    ports:
+      - 8989:8989
+    restart: unless-stopped
