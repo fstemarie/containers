@@ -1,0 +1,28 @@
+{
+	"deploy.reloaded": {
+		"alwaysShowWorkspaceNameInPopups": true,
+		"packages": [
+			{
+				"name": "docker-compose scripts",
+				"description": "Mes script de docker-compose",
+				"files": [
+					"**/docker-compose.yml",
+					"**/docker-compose.yaml"
+				]
+			}
+		],
+		"targets": [
+			{
+				"type": "sftp",
+				"name": "Raktar - docker-compose",
+				"description": "Pour deployer mes scripts docker-compose",
+
+				"dir": "/home/francois/docker-compose",
+				"host": "raktar.local",
+				"port": 22,
+				"user": "francois",
+				"agent": "pageant"
+			}
+		]
+	}
+}
