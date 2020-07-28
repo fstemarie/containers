@@ -11,7 +11,7 @@ services:
       - WEBUI_PORT=8080
     volumes:
       - /containers/qbittorrent/config:/config
-      - /sharedfolders/Downloads:/downloads
+      - /srv/dev-disk-by-label-Slim/slim/files/downloads:/downloads
     ports:
       - 6881:6881
       - 6881:6881/udp
@@ -47,8 +47,8 @@ services:
       - UMASK_SET=022 #optional
     volumes:
       - /containers/radarr/config:/config
-      - /sharedfolders/Movies:/movies
-      - /sharedfolders/Downloads:/downloads
+      - /srv//dev-disk-by-label-Mauve/mauve/video/movies:/movies
+      - /srv//dev-disk-by-label-Slim/slim/files/downloads:/downloads
     ports:
       - 7878:7878
     labels:
@@ -65,8 +65,10 @@ services:
       - UMASK_SET=022 #optional
     volumes:
       - /containers/sonarr/config:/config
-      - /sharedfolders/tvshows:/tv
-      - /sharedfolders/Downloads:/downloads
+      - /srv//dev-disk-by-label-Tangerine/tangerine/video/tvshows:/tv
+      - /srv//dev-disk-by-label-Tangerine/tangerine/video/others/documentaries:/videos/documentaries
+      - /srv//dev-disk-by-label-Tangerine/tangerine/video/others/miniseries:/videos/miniseries
+      - /srv//dev-disk-by-label-Slim/slim/files/downloads:/downloads
     ports:
       - 8989:8989
     labels:
@@ -78,3 +80,5 @@ services:
     container_name: watchtower
     environment:
       - WATCHTOWER_LABEL_ENABLE
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
