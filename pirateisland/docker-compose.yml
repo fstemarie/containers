@@ -48,6 +48,7 @@ services:
     volumes:
       - /containers/radarr/config:/config
       - /sharedfolders/Movies:/movies
+      - /sharedfolders/Videos/documentaries:/videos/documentaries
       - /sharedfolders/Downloads:/downloads
     ports:
       - 7878:7878
