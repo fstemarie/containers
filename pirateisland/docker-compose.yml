@@ -77,6 +77,24 @@ services:
       - "LABEL com.centurylinklabs.watchtower.enable=true"
     restart: unless-stopped
 
+  lidarr:
+    image: linuxserver/lidarr
+    container_name: lidarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+      - UMASK_SET=022 #optional
+    volumes:
+      - /containers/lidarr/config:/config
+      - /sharedfolders/Music:/music
+      - /sharedfolders/Downloads:/downloads
+    ports:
+      - 8686:8686
+    labels:
+      - "LABEL com.centurylinklabs.watchtower.enable=true"
+    restart: unless-stopped
+
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
