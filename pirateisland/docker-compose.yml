@@ -51,6 +51,7 @@ services:
       - /sharedfolders/Videos/documentaries:/videos/documentaries
       - /sharedfolders/Videos/ufc:/videos/ufc
       - /sharedfolders/Downloads:/downloads
+      - /sharedfolders/Storage/backup/radarr:/config/Backups
     ports:
       - 7878:7878
     labels:
@@ -71,6 +72,7 @@ services:
       - /sharedfolders/Videos/documentaries:/videos/documentaries
       - /sharedfolders/Videos/miniseries:/videos/miniseries
       - /sharedfolders/Downloads:/downloads
+      - /sharedfolders/Storage/backup/radarr:/config/Backups
     ports:
       - 8989:8989
     labels:
@@ -81,7 +83,7 @@ services:
     image: linuxserver/lidarr
     container_name: lidarr
     environment:
-      - PUID=1000
+      - PUID=1005
       - PGID=1000
       - TZ=America/Toronto
       - UMASK_SET=022 #optional
@@ -89,6 +91,7 @@ services:
       - /containers/lidarr/config:/config
       - /sharedfolders/Music:/music
       - /sharedfolders/Downloads:/downloads
+      - /sharedfolders/Storage/backup/lidarr:/config/Backups
     ports:
       - 8686:8686
     labels:

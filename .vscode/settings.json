@@ -8,7 +8,15 @@
 				"files": [
 					"**/docker-compose.yml",
 					"**/docker-compose.yaml"
-				]
+				],
+				"targets": ["Raktar - docker-compose"],
+				"deployOnSave": true,
+				"deployOnChange": true,
+				"button": {
+					"text": "Push to Raktar",
+					"tooltip": "Deploy the package to Raktar",
+					"targets": ["Raktar - docker-compose"]
+				}
 			}
 		],
 		
@@ -27,14 +35,6 @@
 					"/**/*.yml": 664,
 					"/**/*.yaml": 664,
 				}
-			}
-		],
-
-		"buttons": [
-			{
-				"text": "Push to Raktar",
-				"command": "extension.deploy.reloaded.pullPackgeFiles",
-				"arguments": [ "docker-compose scripts", "Raktar - docker-compose"]
 			}
 		]
 	}
