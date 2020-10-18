@@ -50,6 +50,7 @@ services:
       - /sharedfolders/Movies:/movies
       - /sharedfolders/Videos/documentaries:/videos/documentaries
       - /sharedfolders/Videos/ufc:/videos/ufc
+      - /sharedfolders/Videos/owned:/videos/owned
       - /sharedfolders/Downloads:/downloads
       - /sharedfolders/Backup/radarr:/config/Backups
     ports:
