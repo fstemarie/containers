@@ -1,0 +1,22 @@
+version: "2"
+services:
+  medusa:
+    image: linuxserver/medusa
+    container_name: medusa
+    environment:
+      - PUID=1004
+      - PGID=1000
+      - TZ=America/Toronto
+      - UMASK_SET=022 #optional
+    volumes:
+      - /containers/medusa/config:/config
+      - /sharedfolders/TVShows:/tv
+      - /sharedfolders/Videos/documentaries:/videos/documentaries
+      - /sharedfolders/Videos/miniseries:/videos/miniseries
+      - /sharedfolders/Downloads:/downloads
+      - /sharedfolders/Backup/medusa:/config/Backups
+    ports:
+      - 8081:8081
+    labels:
+      - "LABEL com.centurylinklabs.watchtower.enable=true"
+    restart: unless-stopped

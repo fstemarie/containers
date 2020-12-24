@@ -1,0 +1,26 @@
+version: "2"
+services:
+  airsonic:
+    image: linuxserver/airsonic
+    container_name: airsonic
+    environment:
+      - PUID=1006
+      - PGID=1000
+      - TZ=America/Toronto
+      #- CONTEXT_PATH=URL_BASE #optional
+      #- JAVA_OPTS=options #optional
+    volumes:
+      - /containers/airsonic/config:/config
+      - /sharedfolders/music/Albums:/music/albums
+      - /sharedfolders/music/Tracks:/music/tracks
+      - /sharedfolders/music/Youtube:/music/youtube
+      - /sharedfolders/music/Games:/music/games
+      - /sharedfolders/music/Humour:/music/humour
+      - /sharedfolders/music/Soothing sounds:/music/soothing
+      - /sharedfolders/playlists:/playlists
+      - /sharedfolders/podcasts:/podcasts
+    ports:
+      - 4040:4040
+    #devices:
+      #- /dev/snd:/dev/snd #optional
+    restart: unless-stopped
