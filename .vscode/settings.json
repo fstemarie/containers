@@ -3,21 +3,51 @@
 		"alwaysShowWorkspaceNameInPopups": true,
 		"packages": [
 			{
-				"name": "docker-compose scripts",
-				"description": "Mes script de docker-compose",
+				"name": "airsonic",
+				"description": "Projet Airsonic",
 				"files": [
-					"**/docker-compose.yml",
-					"**/docker-compose.yaml"
+					"airsonic/docker-compose.yml"
 				],
 				"targets": ["Raktar - docker-compose"],
 				"deployOnSave": true,
 				"deployOnChange": true,
 				"button": {
-					"text": "Push to Raktar",
+					"text": "Airsonic",
+					"tooltip": "Deploy the package to Raktar",
+					"targets": ["Raktar - docker-compose"]
+				}
+			},
+			{
+				"name": "medusa",
+				"description": "Projet Medusa",
+				"files": [
+					"medusa/docker-compose.yml"
+				],
+				"targets": ["Raktar - docker-compose"],
+				"deployOnSave": true,
+				"deployOnChange": true,
+				"button": {
+					"text": "Medusa",
+					"tooltip": "Deploy the package to Raktar",
+					"targets": ["Raktar - docker-compose"]
+				}
+			},
+			{
+				"name": "pirateisland",
+				"description": "Pirate Island",
+				"files": [
+					"pirateisland/docker-compose.yml"
+				],
+				"targets": ["Raktar - docker-compose"],
+				"deployOnSave": true,
+				"deployOnChange": true,
+				"button": {
+					"text": "PirateIsland",
 					"tooltip": "Deploy the package to Raktar",
 					"targets": ["Raktar - docker-compose"]
 				}
 			}
+
 		],
 		
 		"targets": [
