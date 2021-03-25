@@ -1,0 +1,33 @@
+version: "2"
+services:
+  nginx:
+    image: ghcr.io/linuxserver/nginx
+    hostname: nginx
+    container_name: nginx
+    environment:
+      - PUID=1008
+      - PGID=1000
+      - TZ=America/Toronto
+    volumes:
+      - /var/containers/nginx/config:/config
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+
+  heimdall:
+    image: ghcr.io/linuxserver/heimdall
+    hostname: heimdall
+    container_name: heimdall
+    environment:
+      - PUID=1007
+      - PGID=1000
+      - TZ=America/Toronto
+    volumes:
+      - /var/containers/heimdall/config:/config
+    ports:
+      - 8081:80
+      - 8444:443
+    restart: unless-stopped
+    labels:
+      - "LABEL com.centurylinklabs.watchtower.enable=true"
