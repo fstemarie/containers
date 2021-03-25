@@ -7,8 +7,9 @@ services:
       - PUID=1006
       - PGID=1000
       - TZ=America/Toronto
+      - CONTEXT_PATH=/airsonic
     volumes:
-      - /containers/airsonic/config:/config
+      - /var/containers/airsonic/config:/config
       - /sharedfolders/Music/Albums:/music/Albums
       - /sharedfolders/Music/Tracks:/music/Tracks
       - /sharedfolders/Music/Youtube:/music/Youtube
@@ -20,3 +21,5 @@ services:
     ports:
       - 4040:4040
     restart: unless-stopped
+    labels:
+      - "LABEL com.centurylinklabs.watchtower.enable=true"
