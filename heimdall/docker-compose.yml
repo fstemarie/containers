@@ -11,8 +11,8 @@ services:
     volumes:
       - /var/containers/heimdall/config:/config
     ports:
-      - 10080:80
-      - 10443:443
+      - 9080:80
+      - 9443:443
     restart: unless-stopped
     labels:
       - "LABEL com.centurylinklabs.watchtower.enable=true"
