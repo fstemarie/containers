@@ -2,7 +2,7 @@ version: "2"
 services:
   watchtower:
     image: containrrr/watchtower
-    container_name: watchtower
+    container_name: watchtower2
     environment:
       - WATCHTOWER_LABEL_ENABLE
     volumes:
