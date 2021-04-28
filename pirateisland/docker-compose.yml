@@ -30,7 +30,9 @@ services:
       - WEBUI_PORT=8081
     volumes:
       - /var/containers/qbittorrent/config:/config
-      - /sharedfolders/Downloads:/downloads
+      - /var/containers/qbittorrent/torrents:/torrents
+      - /srv/dev-disk-by-label-Copper/copper/files/downloads:/downloads
+      - /srv/dev-disk-by-label-Emerald/emerald/:/data
     ports:
       - 6881:6881
       - 6881:6881/udp
@@ -50,12 +52,8 @@ services:
       - UMASK=022 #optional
     volumes:
       - /var/containers/radarr/config:/config
-      - /sharedfolders/Movies:/movies
-      - /sharedfolders/Videos/documentaries:/videos/documentaries
-      - /sharedfolders/Videos/ufc:/videos/ufc
-      - /sharedfolders/Videos/owned:/videos/owned
-      - /sharedfolders/Downloads:/downloads
-      - /sharedfolders/Backup/radarr:/config/Backups
+      - /srv/dev-disk-by-label-Slim/slim/files/backup/radarr:/config/backup
+      - /srv/dev-disk-by-label-Emerald/emerald:/data
     ports:
       - 7878:7878
     labels:
@@ -73,11 +71,8 @@ services:
       - UMASK=022 #optional
     volumes:
       - /var/containers/sonarr/config:/config
-      - /sharedfolders/TVShows:/tv
-      - /sharedfolders/Videos/documentaries:/videos/documentaries
-      - /sharedfolders/Videos/miniseries:/videos/miniseries
-      - /sharedfolders/Downloads:/downloads
-      - /sharedfolders/Backup/sonarr:/config/Backups
+      - /srv/dev-disk-by-label-Slim/slim/files/backup/sonarr:/config/backup
+      - /srv/dev-disk-by-label-Emerald/emerald:/data
     ports:
       - 8989:8989
     labels:
