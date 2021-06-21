@@ -26,7 +26,7 @@ services:
       - PUID=1001
       - PGID=1000
       - TZ=America/Toronto
-      - UMASK_SET=022
+      - UMASK=022
       - WEBUI_PORT=8081
     volumes:
       - /var/containers/qbittorrent/config:/config
