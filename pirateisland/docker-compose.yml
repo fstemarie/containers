@@ -30,7 +30,6 @@ services:
       - WEBUI_PORT=8081
     volumes:
       - /var/containers/qbittorrent/config:/config
-      - /srv/dev-disk-by-label-Copper/copper/files/torrents:/torrents
       - /srv/dev-disk-by-label-Copper/copper/files/downloads:/downloads
       - /srv/dev-disk-by-label-Emerald/emerald/:/data
     ports:
