@@ -58,7 +58,7 @@ services:
     labels:
       - "LABEL com.centurylinklabs.watchtower.enable=true"
     restart: unless-stopped
-    
+
   sonarr:
     image: ghcr.io/linuxserver/sonarr
     container_name: sonarr
@@ -70,7 +70,7 @@ services:
       - UMASK=022 #optional
     volumes:
       - /var/containers/sonarr/config:/config
-      - /srv/dev-disk-by-label-Slim/slim/files/backup/sonarr:/config/backup
+      - /srv/dev-disk-by-label-Slim/slim/files/backup/sonarr:/config/Backups
       - /srv/dev-disk-by-label-Emerald/emerald:/data
     ports:
       - 8989:8989
