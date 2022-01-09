@@ -5,7 +5,7 @@ services:
     container_name: airsonic
     environment:
       - PUID=1006
-      - PGID=1000
+      - PGID=2000
       - TZ=America/Toronto
       - CONTEXT_PATH=/airsonic
     volumes:

@@ -6,7 +6,7 @@ services:
     container_name: heimdall
     environment:
       - PUID=1007
-      - PGID=1000
+      - PGID=2000
       - TZ=America/Toronto
     volumes:
       - /var/containers/heimdall/config:/config
