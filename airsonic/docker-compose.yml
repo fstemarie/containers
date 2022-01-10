@@ -10,14 +10,15 @@ services:
       - CONTEXT_PATH=/airsonic
     volumes:
       - /var/containers/airsonic/config:/config
-      - /sharedfolders/Music/Albums:/music/Albums
-      - /sharedfolders/Music/Tracks:/music/Tracks
-      - /sharedfolders/Music/Youtube:/music/Youtube
-      - /sharedfolders/Music/Games:/music/Games
-      - /sharedfolders/Music/Humour:/music/Humour
-      - /sharedfolders/Music/Soothing Sounds:/music/Soothing Sounds
-      - /sharedfolders/Music/Playlists:/playlists
-      - /sharedfolders/Music/Podcasts:/podcasts
+      - /srv/dev-disk-by-label-Copper/copper/audio/Albums:/music/Albums
+      - /srv/dev-disk-by-label-Copper/copper/audio/Tracks:/music/Tracks
+      - /srv/dev-disk-by-label-Copper/copper/audio/Youtube:/music/Youtube
+      - /srv/dev-disk-by-label-Copper/copper/audio/Games:/music/Games
+      - /srv/dev-disk-by-label-Copper/copper/audio/Humour:/music/Humour
+      - /srv/dev-disk-by-label-Copper/copper/audio/Soothing Sounds:/music/Soothing Sounds
+      - /srv/dev-disk-by-label-Copper/copper/audio/gPodder:/music/gPodder
+      - /srv/dev-disk-by-label-Copper/copper/audio/Playlists:/playlists
+      - /srv/dev-disk-by-label-Copper/copper/audio/Podcasts:/podcasts
     ports:
       - 4040:4040
     restart: unless-stopped
