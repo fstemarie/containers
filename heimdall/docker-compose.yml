@@ -9,7 +9,7 @@ services:
       - PGID=2000
       - TZ=America/Toronto
     volumes:
-      - /var/containers/heimdall/config:/config
+      - /data/containers/heimdall/config:/config
     ports:
       - 9080:80
       - 9443:443
