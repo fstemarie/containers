@@ -1,26 +1,22 @@
-version: "2"
 services:
   airsonic:
-    image: ghcr.io/linuxserver/airsonic
+    image: lscr.io/linuxserver/airsonic-advanced
     container_name: airsonic
     environment:
-      - PUID=1006
-      - PGID=2000
+      - PUID=996
+      - PGID=992
       - TZ=America/Toronto
       - CONTEXT_PATH=/airsonic
     volumes:
-      - /var/containers/airsonic/config:/config
-      - /srv/dev-disk-by-label-Copper/copper/audio/Albums:/music/Albums
-      - /srv/dev-disk-by-label-Copper/copper/audio/Tracks:/music/Tracks
-      - /srv/dev-disk-by-label-Copper/copper/audio/Youtube:/music/Youtube
-      - /srv/dev-disk-by-label-Copper/copper/audio/Games:/music/Games
-      - /srv/dev-disk-by-label-Copper/copper/audio/Humour:/music/Humour
-      - /srv/dev-disk-by-label-Copper/copper/audio/Soothing Sounds:/music/Soothing Sounds
-      - /srv/dev-disk-by-label-Copper/copper/audio/gPodder:/music/gPodder
-      - /srv/dev-disk-by-label-Copper/copper/audio/Playlists:/playlists
-      - /srv/dev-disk-by-label-Copper/copper/audio/Podcasts:/podcasts
-    ports:
-      - 4040:4040
+      - /data/containers/airsonic/config:/config
+      - /disks/mauve/audio/music:/music:ro
+      - /disks/mauve/audio/playlists:/playlists
+      - /disks/mauve/audio/podcasts/airsonic:/podcasts
+      - /disks/mauve/audio/podcasts/gPodder:/media/gPodder:ro
+    network_mode: host
+    # ports:
+    #   - 4040:4040
+    #   - 4041:4041
     restart: unless-stopped
     labels:
       - "LABEL com.centurylinklabs.watchtower.enable=true"
