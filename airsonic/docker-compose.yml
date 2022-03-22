@@ -3,16 +3,18 @@ services:
     image: lscr.io/linuxserver/airsonic-advanced
     container_name: airsonic
     environment:
-      - PUID=996
+      - PUID=990
       - PGID=992
       - TZ=America/Toronto
       - CONTEXT_PATH=/airsonic
     volumes:
       - /data/containers/airsonic/config:/config
-      - /disks/mauve/audio/music:/music:ro
+      - /disks/mauve/audio/music:/audio/music:ro
+      - /disks/mauve/audio/comedy:/audio/comedy:ro
       - /disks/mauve/audio/playlists:/playlists
-      - /disks/mauve/audio/podcasts/airsonic:/podcasts
-      - /disks/mauve/audio/podcasts/gPodder:/media/gPodder:ro
+      - /disks/mauve/audio/podcasts:/audio/podcasts:ro
+      - /disks/mauve/audio/podcasts_airsonic:/podcasts
+      - ./run:/etc/services.d/airsonic/run
     network_mode: host
     # ports:
     #   - 4040:4040
