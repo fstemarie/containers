@@ -1,7 +1,7 @@
 version: "2"
 services:
   heimdall:
-    image: ghcr.io/linuxserver/heimdall
+    image: lscr.io/linuxserver/heimdall
     hostname: heimdall
     container_name: heimdall
     environment:

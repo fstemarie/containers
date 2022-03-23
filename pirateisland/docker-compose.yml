@@ -1,6 +1,6 @@
 services:
   jackett:
-    image: ghcr.io/linuxserver/jackett:latest
+    image: lscr.io/linuxserver/jackett:latest
     container_name: jackett
     hostname: jackett
     environment:
@@ -18,7 +18,7 @@ services:
     restart: unless-stopped
 
   qbittorrent:
-    image: ghcr.io/linuxserver/qbittorrent:latest
+    image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
     hostname: qbittorrent
     environment:
@@ -40,7 +40,7 @@ services:
     restart: unless-stopped
 
   radarr:
-    image: ghcr.io/linuxserver/radarr:latest
+    image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     hostname: radarr
     environment:
@@ -59,7 +59,7 @@ services:
     restart: unless-stopped
 
   sonarr:
-    image: ghcr.io/linuxserver/sonarr:latest
+    image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
     hostname: sonarr
     environment:
@@ -78,7 +78,7 @@ services:
     restart: unless-stopped
 
   flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:latest
+    image: lscr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
     hostname: flaresolverr
     environment:
@@ -91,7 +91,7 @@ services:
     restart: unless-stopped
 
   # lidarr:
-  #   image: linuxserver/lidarr
+  #   image: lscr.io/linuxserver/lidarr
   #   container_name: lidarr
   #   environment:
   #     - PUID=1005
@@ -99,8 +99,8 @@ services:
   #     - TZ=America/Toronto
   #     - UMASK_SET=022 #optional
   #   volumes:
-  #     - /var/containers/lidarr/config:/config
-  #     - /sharedfolders/Music:/music
+  #     - /data/containers/lidarr/config:/config
+  #     - /disks/mauve/audio/music:/music
   #     - /sharedfolders/Downloads:/downloads
   #     - /sharedfolders/Backup/lidarr:/config/Backups
   #   ports:
