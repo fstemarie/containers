@@ -14,7 +14,7 @@ services:
       - /disks/mauve/audio/playlists:/playlists
       - /disks/mauve/audio/podcasts:/audio/podcasts:ro
       - /disks/mauve/audio/podcasts_airsonic:/podcasts
-      - ./run:/etc/services.d/airsonic/run
+      # - ./run:/etc/services.d/airsonic/run
     network_mode: host
     # ports:
     #   - 4040:4040
