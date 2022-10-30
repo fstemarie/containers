@@ -50,7 +50,7 @@ services:
       - UMASK=022 #optional
     volumes:
       - "/data/containers/radarr/config:/config"
-      - "/disks/slim/files/backup/raktar/containers/radarr:/config/backup"
+      - "/disks/slim/files/backup/raktar/radarr:/config/backup"
       - "/disks/emerald:/emerald"
     ports:
       - 7878:7878
@@ -69,7 +69,7 @@ services:
       - UMASK=022 #optional
     volumes:
       - "/data/containers/sonarr/config:/config"
-      - "/disks/slim/files/backup/raktar/containers/sonarr:/config/Backups"
+      - "/disks/slim/files/backup/raktar/sonarr:/config/Backups"
       - "/disks/emerald:/emerald"
     ports:
       - 8989:8989
