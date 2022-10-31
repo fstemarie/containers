@@ -4,8 +4,8 @@ services:
     container_name: jackett
     hostname: jackett
     environment:
-      - PUID=991
-      - PGID=992
+      - PUID=996
+      - PGID=991
       - TZ=America/Toronto
       - AUTO_UPDATE=true #optional
       #- RUN_OPTS=run options here #optional
@@ -23,14 +23,14 @@ services:
     hostname: qbittorrent
     environment:
       - PUID=995
-      - PGID=992
+      - PGID=991
       - TZ=America/Toronto
       - UMASK=022
       - WEBUI_PORT=8081
     volumes:
       - "/data/containers/qbittorrent/config:/config"
-      - "/disks/copper:/copper"
-      - "/disks/emerald:/emerald"
+      - "/d/copper:/copper"
+      - "/d/emerald:/emerald"
     ports:
       - 6881:6881
       - 6881:6881/udp
@@ -44,14 +44,14 @@ services:
     container_name: radarr
     hostname: radarr
     environment:
-      - PUID=992
-      - PGID=992
+      - PUID=991
+      - PGID=991
       - TZ=America/Toronto
       - UMASK=022 #optional
     volumes:
       - "/data/containers/radarr/config:/config"
-      - "/disks/slim/files/backup/raktar/containers/radarr:/config/backup"
-      - "/disks/emerald:/emerald"
+      - "/d/backup/raktar/radarr:/config/backup"
+      - "/d/emerald:/emerald"
     ports:
       - 7878:7878
     labels:
@@ -63,14 +63,14 @@ services:
     container_name: sonarr
     hostname: sonarr
     environment:
-      - PUID=993
-      - PGID=992
+      - PUID=992
+      - PGID=991
       - TZ=America/Toronto
       - UMASK=022 #optional
     volumes:
       - "/data/containers/sonarr/config:/config"
-      - "/disks/slim/files/backup/raktar/containers/sonarr:/config/Backups"
-      - "/disks/emerald:/emerald"
+      - "/d/backup/raktar/sonarr:/config/Backups"
+      - "/d/emerald:/emerald"
     ports:
       - 8989:8989
     labels:
@@ -89,22 +89,3 @@ services:
     ports:
       - "${PORT:-8191}:8191"
     restart: unless-stopped
-
-  # lidarr:
-  #   image: lscr.io/linuxserver/lidarr
-  #   container_name: lidarr
-  #   environment:
-  #     - PUID=1005
-  #     - PGID=1000
-  #     - TZ=America/Toronto
-  #     - UMASK_SET=022 #optional
-  #   volumes:
-  #     - /data/containers/lidarr/config:/config
-  #     - /disks/mauve/audio/music:/music
-  #     - /sharedfolders/Downloads:/downloads
-  #     - /sharedfolders/Backup/lidarr:/config/Backups
-  #   ports:
-  #     - 8093:8686
-  #   labels:
-  #     - "LABEL com.centurylinklabs.watchtower.enable=true"
-  #   restart: unless-stopped

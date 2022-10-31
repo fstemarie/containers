@@ -4,16 +4,16 @@ services:
     container_name: airsonic
     environment:
       - PUID=990
-      - PGID=992
+      - PGID=991
       - TZ=America/Toronto
-      - CONTEXT_PATH=/airsonic
+      # - CONTEXT_PATH=/airsonic
     volumes:
       - /data/containers/airsonic/config:/config
-      - /disks/mauve/audio/music:/audio/music:ro
-      - /disks/mauve/audio/comedy:/audio/comedy:ro
-      - /disks/mauve/audio/playlists:/playlists
-      - /disks/mauve/audio/podcasts:/audio/podcasts:ro
-      - /disks/mauve/audio/podcasts_airsonic:/podcasts
+      - /d/copper/audio/music:/audio/music:ro
+      - /d/copper/audio/comedy:/audio/comedy:ro
+      - /d/copper/audio/playlists:/playlists
+      - /d/copper/audio/podcasts:/audio/podcasts:ro
+      - /d/copper/audio/podcasts_airsonic:/podcasts
       # - ./run:/etc/services.d/airsonic/run
     network_mode: host
     # ports:
