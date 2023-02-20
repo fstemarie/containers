@@ -1,0 +1,31 @@
+---
+networks:
+  lagoon:
+    external: true
+  
+  ocean:
+    driver: macvlan
+    driver_opts:
+      parent: enp1s0
+      macvlan_mode: bridge
+    name: ocean
+    ipam:
+      config:
+        - subnet: 192.168.0.0/16
+
+volumes:
+  data:
+
+services:
+  caddy:
+    image: caddy
+    container_name: caddy
+    volumes:
+      - "/data/containers/caddy:/config"
+      - "./Caddyfile:/etc/caddy/Caddyfile"
+      - "data:/data"
+    networks:
+      lagoon:
+      ocean:
+        ipv4_address: 192.168.1.4
+    restart: unless-stopped
