@@ -1,24 +1,24 @@
+---
+networks:
+  lagoon:
+    external: true
+
 services:
   airsonic:
     image: lscr.io/linuxserver/airsonic-advanced
     container_name: airsonic
     environment:
-      - PUID=990
-      - PGID=991
-      - TZ=America/Toronto
+      - PUID=985
+      - PGID=985
+      - TZ=America/Montreal
       - CONTEXT_PATH=/airsonic
     volumes:
-      - /data/containers/airsonic/config:/config
-      - /d/copper/audio/music:/audio/music:ro
-      - /d/copper/audio/comedy:/audio/comedy:ro
-      - /d/copper/audio/playlists:/playlists
-      - /d/copper/audio/podcasts:/audio/podcasts:ro
-      - /d/copper/audio/podcasts_airsonic:/podcasts
-      # - ./run:/etc/services.d/airsonic/run
-    network_mode: host
+      - /data/containers/airsonic:/config
+      - /d/ruby/audio:/audio:ro
+      - /d/ruby/audio/playlists:/playlists
+    networks:
+      - lagoon
     ports:
-      - 127.0.0.1:4040:4040
-      - 127.0.0.1:4041:4041
+      - 4040:4040
+      - 4041:4041
     restart: unless-stopped
-    labels:
-      - "LABEL com.centurylinklabs.watchtower.enable=true"
