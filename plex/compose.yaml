@@ -15,7 +15,7 @@ services:
       - TZ=America/Montreal
     network_mode: host
     # networks:
-    #   - home
+    #   - lagoon
     # ports:
     #   - 32400:32400
     volumes:

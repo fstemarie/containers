@@ -1,13 +1,12 @@
 ---
 # networks:
-#   home:
+#   lagoon:
 #     external: true
 
 services:
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
-    network_mode: host
     environment:
       - PUID=984
       - PGID=984
@@ -16,8 +15,9 @@ services:
     volumes:
       - /data/containers/jellyfin:/config
       - /d/emerald/video:/video
+    network_mode: host
     # networks:
-    #   - home
+    #   - lagoon
     # ports:
     #   - 8096:8096
     #   - 8920:8920 #optional
