@@ -1,0 +1,24 @@
+---
+# networks:
+#   lagoon:
+#     external: true
+
+services:
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    environment:
+      - PUID=984
+      - PGID=984
+      - VERSION=docker
+      - PLEX_CLAIM=
+      - TZ=America/Montreal
+    network_mode: host
+    # networks:
+    #   - home
+    # ports:
+    #   - 32400:32400
+    volumes:
+      - /data/containers/plex:/config
+      - /d/emerald/video:/video
+    restart: unless-stopped
