@@ -1,0 +1,18 @@
+---
+
+services:
+  xteve:
+    image: alturismo/xteve
+    container_name: xteve
+    environment:
+      - TZ=America/Montreal
+    volumes:
+      - /data/containers/xteve/config:/config
+      - /data/containers/xteve/userdata:/root/.xteve
+      - /data/containers/xteve/tmp:/tmp/xteve
+      - /data/config/iptv:/iptv
+    network_mode: host
+    # ports:
+    #   - 34400:34400
+    restart: unless-stopped
+
