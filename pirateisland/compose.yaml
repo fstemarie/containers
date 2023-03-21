@@ -17,8 +17,8 @@ services:
     volumes:
       - "/data/containers/qbittorrent:/config"
       - "/d/ruby/downloads:/downloads"
-      - "/d/emerald:/box1"
-      - "/d/ruby:/box2"
+      - "/d/emerald:/emerald"
+      - "/d/ruby:/ruby"
     networks:
       - lagoon
     ports:
@@ -37,7 +37,7 @@ services:
     volumes:
       - "/data/containers/radarr:/config"
       - "/l/backup/raktar/radarr:/config/backup"
-      - "/d/emerald:/box1"
+      - "/d/emerald:/emerald"
     networks:
       - lagoon
     ports:
@@ -55,7 +55,7 @@ services:
     volumes:
       - "/data/containers/sonarr:/config"
       - "/l/backup/raktar/sonarr:/config/Backups"
-      - "/d/emerald:/box1"
+      - "/d/emerald:/emerald"
     networks:
       - lagoon
     ports:
