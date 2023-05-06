@@ -1,7 +1,4 @@
 ---
-networks:
-  lagoon:
-    external: true
 
 services:
   airsonic:
@@ -11,14 +8,14 @@ services:
       - PUID=985
       - PGID=985
       - TZ=America/Montreal
-      - CONTEXT_PATH=/airsonic
+      # - "JAVA_OPTS=-Dserver.port=80"
+      # - CONTEXT_PATH=/airsonic
     volumes:
       - /data/containers/airsonic:/config
       - /d/ruby/audio:/audio:ro
       - /d/ruby/audio/playlists:/playlists
-    networks:
-      - lagoon
-    ports:
-      - 4040:4040
-      - 4041:4041
+    network_mode: host
+    # ports:
+    #   - 4040:4040
+    #   - 4041:4041
     restart: unless-stopped
