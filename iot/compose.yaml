@@ -1,0 +1,70 @@
+---
+
+networks:
+  johnny:
+    external: true
+
+  lagoon:
+    external: true
+
+volumes:
+  mosquitto_data:
+
+services:
+  nodered:
+    image: docker.io/nodered/node-red
+    container_name: nodered
+    env_file:
+      - ~/secrets/nodered.env
+    environment:
+      - NODE_RED_HTTPADMINROOT=/
+      - NODE_RED_HTTPNODEROOT=/
+      - NODE_RED_PORT=443
+      - TZ=America/Montreal
+    volumes:
+      - /data/containers/nodered:/data
+    networks:
+      lagoon:
+      johnny:
+        ipv4_address: 192.168.1.210
+    # ports:
+    #   - 1880:1880
+    restart: unless-stopped
+
+  homeassistant:
+    image: lscr.io/linuxserver/homeassistant
+    container_name: homeassistant
+    environment:
+      - PUID=986
+      - PGID=986
+      - HA_PORT=443
+      - HA_SSL_KEY=/config/ssl/homeassistant.home.key.pem
+      - HA_SSL_CERTIFICATE=/config/ssl/homeassistant.home.cert.pem
+      - TZ=America/Montreal
+    volumes:
+      - /data/containers/homeassistant:/config
+      - ~/ca/private/homeassistant.home.key.pem:/config/ssl/homeassistant.home.key.pem
+      - ~/ca/certs/homeassistant.home.cert.pem:/config/ssl/homeassistant.home.cert.pem
+    networks:
+      lagoon:
+      johnny:
+        ipv4_address: 192.168.1.211
+    # ports:
+    #   - 8123:8123 #optional
+    restart: unless-stopped
+
+  # mosquitto:
+  #   image: docker.io/eclipse-mosquitto
+  #   container_name: mosquitto
+  #   volumes:
+  #     - mosquitto_data:/mosquitto/data
+  #     - /data/containers/mosquitto/config:/mosquitto/config
+  #     - /data/containers/mosquitto/log:/mosquitto/log
+  #   networks:
+  #     lagoon:
+  #     johnny:
+  #       ipv4_address: 192.168.1.212
+  #   # ports:
+  #   #   - 1883:1883
+  #   #   - 9001:9001
+  #   restart: unless-stopped
