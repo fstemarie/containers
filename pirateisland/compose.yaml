@@ -1,94 +1,125 @@
 ---
+
 networks:
-  #docker network create -d bridge --subnet=172.16.0.0/16 --gateway=172.16.0.1 lagoon
+  # docker network create -d macvlan --subnet=192.168.0.0/16 --gateway=192.168.0.1 -o macvlan_mode=bridge -o parent=enp1s0 johnny
+  johnny:
+    external: true
+  
+  # docker network create --subnet=172.16.0.0/24 lagoon
   lagoon:
     external: true
+    # name: lagoon
+    # ipam:
+    #   config: [subnet: 172.16.0.0/24]
 
 services:
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
+    image: lscr.io/linuxserver/qbittorrent
     container_name: qbittorrent
+    hostname: qbittorrent
     environment:
       - PUID=989
       - PGID=989
       - TZ=America/Montreal
       - UMASK=022
-      - WEBUI_PORT=8080
+      - WEBUI_PORT=80
     volumes:
-      - "/data/containers/qbittorrent:/config"
-      - "/d/ruby/downloads:/downloads"
-      - "/d/emerald:/emerald"
-      - "/d/ruby:/ruby"
+      - /data/containers/qbittorrent:/config
+      - /d/ruby/downloads:/downloads
+      - /d/emerald:/emerald
+      - /d/ruby:/ruby
     networks:
-      - lagoon
-    ports:
-      - 6881:6881
-      - 8080:8080
+      lagoon:
+      johnny:
+        ipv4_address: 192.168.1.200
+    # ports:
+    #   - 6881:6881
+    #   - 8080:8080
     restart: unless-stopped
 
   radarr:
-    image: lscr.io/linuxserver/radarr:latest
+    image: lscr.io/linuxserver/radarr
     container_name: radarr
+    hostname: radarr
     environment:
       - PUID=984
       - PGID=984
       - TZ=America/Montreal
       - UMASK=022 #optional
     volumes:
-      - "/data/containers/radarr:/config"
-      - "/l/backup/raktar/radarr:/config/backup"
-      - "/d/emerald:/emerald"
+      - /data/containers/radarr:/config
+      - /l/backup/raktar/radarr:/config/backup
+      - /d/emerald:/emerald
     networks:
-      - lagoon
-    ports:
-      - 7878:7878
+      lagoon:
+      johnny:
+        ipv4_address: 192.168.1.201
+    # ports:
+    #   - 7878:7878
     restart: unless-stopped
 
   sonarr:
-    image: lscr.io/linuxserver/sonarr:latest
+    image: lscr.io/linuxserver/sonarr
     container_name: sonarr
+    hostname: sonarr
     environment:
       - PUID=984
       - PGID=984
       - TZ=America/Montreal
       - UMASK=022 #optional
     volumes:
-      - "/data/containers/sonarr:/config"
-      - "/l/backup/raktar/sonarr:/config/Backups"
-      - "/d/emerald:/emerald"
+      - /data/containers/sonarr:/config
+      - /l/backup/raktar/sonarr:/config/Backups
+      - /d/emerald:/emerald
     networks:
-      - lagoon
-    ports:
-      - 8989:8989
+      lagoon:
+      johnny:
+        ipv4_address: 192.168.1.202
+    # ports:
+    #   - 8989:8989
     restart: unless-stopped
 
   jackett:
-    image: lscr.io/linuxserver/jackett:latest
+    image: lscr.io/linuxserver/jackett
     container_name: jackett
+    hostname: jackett
     environment:
       - PUID=988
       - PGID=988
       - TZ=America/Montreal
-      - AUTO_UPDATE=true #optional
+      - AUTO_UPDATE=false #optional
       #- RUN_OPTS=run options here #optional
     volumes:
-      - "/data/containers/jackett:/config"
+      - /data/containers/jackett:/config
     networks:
-      - lagoon
-    ports:
-      - 9117:9117
+      lagoon:
+      johnny:
+        ipv4_address: 192.168.1.203
+    # ports:
+    #   - 9117:9117
     restart: unless-stopped
 
   flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:latest
+    image: ghcr.io/flaresolverr/flaresolverr
     container_name: flaresolverr
+    hostname: flaresolverr
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - LOG_HTML=${LOG_HTML:-false}
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
       - TZ=America/Montreal
-    networks:
-      - lagoon
+    networks: [lagoon]
     # ports:
     #   - 8191:8191
     restart: unless-stopped
+
+# networks:
+#   johnny:
+#     name: johnny
+#     driver: macvlan
+#     driver_opts:
+#       parent: enp1s0
+#       macvlan_mode: bridge
+#     ipam:
+#       config:
+#         - subnet: 192.168.0.0/16
