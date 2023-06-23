@@ -1,5 +1,9 @@
 ---
 
+networks:
+  lagoon:
+    external: true
+
 services:
   airsonic:
     image: lscr.io/linuxserver/airsonic-advanced
@@ -12,10 +16,10 @@ services:
       # - CONTEXT_PATH=/airsonic
     volumes:
       - /data/containers/airsonic:/config
-      - /d/ruby/audio:/audio:ro
+      - /d/ruby/audio:/audio
       - /d/ruby/audio/playlists:/playlists
-    network_mode: host
-    # ports:
-    #   - 4040:4040
+    networks: [lagoon]
+    ports:
+      - 4040:4040
     #   - 4041:4041
     restart: unless-stopped
