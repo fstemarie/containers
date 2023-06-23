@@ -12,6 +12,9 @@ networks:
     # ipam:
     #   config: [subnet: 172.16.0.0/24]
 
+volumes:
+  qb_keys:
+
 services:
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent
@@ -28,6 +31,7 @@ services:
       - /d/ruby/downloads:/downloads
       - /d/emerald:/emerald
       - /d/ruby:/ruby
+      - /d/jade/files/torrents:/torrents
     networks:
       lagoon:
       johnny:
@@ -36,6 +40,8 @@ services:
     #   - 6881:6881
     #   - 8080:8080
     restart: unless-stopped
+    labels:
+      - fstemarie.groupby=pirateisland
 
   radarr:
     image: lscr.io/linuxserver/radarr
@@ -57,6 +63,8 @@ services:
     # ports:
     #   - 7878:7878
     restart: unless-stopped
+    labels:
+      - fstemarie.groupby=pirateisland
 
   sonarr:
     image: lscr.io/linuxserver/sonarr
@@ -78,6 +86,8 @@ services:
     # ports:
     #   - 8989:8989
     restart: unless-stopped
+    labels:
+      - fstemarie.groupby=pirateisland
 
   jackett:
     image: lscr.io/linuxserver/jackett
@@ -98,6 +108,8 @@ services:
     # ports:
     #   - 9117:9117
     restart: unless-stopped
+    labels:
+      - fstemarie.groupby=pirateisland
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr
@@ -112,6 +124,8 @@ services:
     # ports:
     #   - 8191:8191
     restart: unless-stopped
+    labels:
+      - fstemarie.groupby=pirateisland
 
 # networks:
 #   johnny:
