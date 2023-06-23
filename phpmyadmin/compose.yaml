@@ -1,0 +1,27 @@
+---
+
+networks:
+  lagoon:
+    external: true
+
+services:
+  phpmyadmin:
+    image: ghcr.io/linuxserver/phpmyadmin
+    container_name: phpmyadmin
+    env_file:
+      - ~/secrets/phpmyadmin.env
+    environment:
+      - TZ=America/Montreal
+      - PMA_HOST=mariadb
+      - PMA_PORT=3306
+      # - PMA_ARBITRARY=1
+      # - PMA_USER=
+      # - PMA_PASSWORD=
+    volumes:
+      - /data/containers/phpmyadmin/config:/config
+    networks: [lagoon]
+    ports:
+      - 8080:80
+    restart: unless-stopped
+    labels:
+      - fstemarie.groupby=database
