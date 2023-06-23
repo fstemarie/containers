@@ -1,0 +1,31 @@
+---
+
+networks:
+  johnny:
+    external: true
+
+  lagoon:
+    external: true
+
+services:
+  homeassistant:
+    image: lscr.io/linuxserver/homeassistant
+    container_name: homeassistant
+    environment:
+      - PUID=986
+      - PGID=986
+      - HA_PORT=443
+      - HA_SSL_KEY=/config/ssl/homeassistant.home.key.pem
+      - HA_SSL_CERTIFICATE=/config/ssl/homeassistant.home.cert.pem
+      - TZ=America/Montreal
+    volumes:
+      - /data/containers/homeassistant:/config
+    networks:
+      lagoon:
+      johnny:
+        ipv4_address: 192.168.1.211
+    # ports:
+    #   - 8123:8123 #optional
+    restart: unless-stopped
+    labels:
+      - fstemarie.groupby=iot

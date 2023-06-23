@@ -1,0 +1,32 @@
+---
+
+networks:
+  johnny:
+    external: true
+
+  lagoon:
+    external: true
+
+services:
+  nodered:
+    image: docker.io/nodered/node-red
+    container_name: nodered
+    env_file:
+      - ~/secrets/nodered.env
+    environment:
+      - NODE_RED_HTTPADMINROOT=/admin
+      - NODE_RED_HTTPNODEROOT=/app
+      - NODE_RED_PORT=443
+      - TZ=America/Montreal
+    volumes:
+      - /data/containers/nodered:/data
+      - /d/ruby/audio/podcasts/:/podcasts
+    networks:
+      lagoon:
+      johnny:
+        ipv4_address: 192.168.1.210
+    # ports:
+    #   - 1880:1880
+    restart: unless-stopped
+    labels:
+      - fstemarie.groupby=iot
