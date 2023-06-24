@@ -21,6 +21,7 @@ services:
     volumes:
       - /data/containers/nodered:/data
       - /d/ruby/audio/podcasts/:/podcasts
+      - /data/workspace/nodered:/workspace
     networks:
       lagoon:
       johnny:
