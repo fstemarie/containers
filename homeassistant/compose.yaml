@@ -14,18 +14,16 @@ services:
     environment:
       - PUID=986
       - PGID=986
-      - HA_PORT=443
-      - HA_SSL_KEY=/config/ssl/homeassistant.home.key.pem
-      - HA_SSL_CERTIFICATE=/config/ssl/homeassistant.home.cert.pem
+      - HA_PORT=80
       - TZ=America/Montreal
     volumes:
       - /data/containers/homeassistant:/config
     networks:
       lagoon:
       johnny:
-        ipv4_address: 192.168.1.211
+        ipv4_address: 192.168.1.210
     # ports:
     #   - 8123:8123 #optional
     restart: unless-stopped
     labels:
-      - fstemarie.groupby=iot
+      - falarie.groupby=iot
