@@ -35,13 +35,13 @@ services:
     networks:
       lagoon:
       johnny:
-        ipv4_address: 192.168.1.200
+        ipv4_address: 192.168.1.220
     # ports:
     #   - 6881:6881
     #   - 8080:8080
     restart: unless-stopped
     labels:
-      - fstemarie.groupby=pirateisland
+      - falarie.groupby=pirateisland
 
   radarr:
     image: lscr.io/linuxserver/radarr
@@ -59,12 +59,12 @@ services:
     networks:
       lagoon:
       johnny:
-        ipv4_address: 192.168.1.201
+        ipv4_address: 192.168.1.221
     # ports:
     #   - 7878:7878
     restart: unless-stopped
     labels:
-      - fstemarie.groupby=pirateisland
+      - falarie.groupby=pirateisland
 
   sonarr:
     image: lscr.io/linuxserver/sonarr
@@ -82,12 +82,12 @@ services:
     networks:
       lagoon:
       johnny:
-        ipv4_address: 192.168.1.202
+        ipv4_address: 192.168.1.222
     # ports:
     #   - 8989:8989
     restart: unless-stopped
     labels:
-      - fstemarie.groupby=pirateisland
+      - falarie.groupby=pirateisland
 
   jackett:
     image: lscr.io/linuxserver/jackett
@@ -104,12 +104,12 @@ services:
     networks:
       lagoon:
       johnny:
-        ipv4_address: 192.168.1.203
+        ipv4_address: 192.168.1.223
     # ports:
     #   - 9117:9117
     restart: unless-stopped
     labels:
-      - fstemarie.groupby=pirateisland
+      - falarie.groupby=pirateisland
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr
@@ -125,7 +125,7 @@ services:
     #   - 8191:8191
     restart: unless-stopped
     labels:
-      - fstemarie.groupby=pirateisland
+      - falarie.groupby=pirateisland
 
 # networks:
 #   johnny:
