@@ -15,6 +15,7 @@ services:
   mosquitto:
     image: docker.io/eclipse-mosquitto
     container_name: mosquitto
+    user: "1883:1883"
     volumes:
       - mosquitto_data:/mosquitto/data
       - /data/containers/mosquitto/config:/mosquitto/config
@@ -22,10 +23,10 @@ services:
     networks:
       lagoon:
       johnny:
-        ipv4_address: 192.168.1.212
+        ipv4_address: 192.168.1.211
     # ports:
     #   - 1883:1883
     #   - 9001:9001
     restart: unless-stopped
     labels:
-      - fstemarie.groupby=iot
+      - falarie.groupby=iot
