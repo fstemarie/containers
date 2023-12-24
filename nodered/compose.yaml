@@ -11,13 +11,17 @@ services:
   nodered:
     image: docker.io/nodered/node-red
     container_name: nodered
+    user: 1000:100
     env_file:
       - ~/secrets/nodered.env
     environment:
       - NODE_RED_HTTPADMINROOT=/admin
-      - NODE_RED_HTTPNODEROOT=/app
-      - NODE_RED_PORT=443
-      - TZ=America/Montreal
+      - NODE_RED_HTTPNODEROOT=/
+      - NODE_RED_PORT=80
+      # - NODE_RED_PORT=443
+      # - NODE_RED_SSL_KEY=/data/ssl/nodered.iot.key.pem
+      # - NODE_RED_SSL_CERT=/data/ssl/nodered.iot.cert.pem
+      # - TZ=America/Montreal
     volumes:
       - /data/containers/nodered:/data
       - /d/ruby/audio/podcasts/:/podcasts
@@ -25,9 +29,9 @@ services:
     networks:
       lagoon:
       johnny:
-        ipv4_address: 192.168.1.210
+        ipv4_address: 192.168.1.212
     # ports:
     #   - 1880:1880
     restart: unless-stopped
     labels:
-      - fstemarie.groupby=iot
+      - falarie.groupby=iot
