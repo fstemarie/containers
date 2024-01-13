@@ -1,0 +1,32 @@
+---
+
+networks:
+  johnny:
+    external: true
+
+  lagoon:
+    external: true
+
+services:
+  netbootxyz:
+    image: lscr.io/linuxserver/netbootxyz
+    container_name: netbootxyz
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=America/Montreal
+      # - MENU_VERSION=1.9.9 #optional
+      - PORT_RANGE=30000:30010 #optional
+      - SUBFOLDER=/ #optional
+    volumes:
+      - /data/container/netboox.xyz/config:/config
+      - /data/container/netboox.xyz/assets:/assets
+    networks:
+      lagoon:
+      johnny:
+        ipv4_address: 192.168.1.204
+    # ports:
+    #   - 3000:3000
+    #   - 69:69/udp
+    #   - 8080:80 #optional
+    restart: unless-stopped
