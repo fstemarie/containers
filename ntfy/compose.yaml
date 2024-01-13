@@ -3,7 +3,6 @@
 networks:
   johnny:
     external: true
-
   lagoon:
     external: true
 
@@ -18,13 +17,13 @@ services:
       - TZ=America/Montreal
     user: 1000:100 # optional: replace with your own user/group or uid/gid
     volumes:
-      - /var/cache/ntfy:/var/cache/ntfy
+      - /data/containers/ntfy/cache:/var/cache/ntfy
       - /data/containers/ntfy/server.yml:/etc/ntfy/server.yml
       - /data/containers/ntfy:/config
     networks:
       lagoon:
       johnny:
-        ipv4_address: 192.168.1.201
+        ipv4_address: 192.168.1.4
     healthcheck: # optional: remember to adapt the host:port to your environment
         test: ["CMD-SHELL", "wget -q --tries=1 http://ntfy.home/v1/health -O - | grep -Eo '\"healthy\"\\s*:\\s*true' || exit 1"]
         interval: 60s

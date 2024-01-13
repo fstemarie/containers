@@ -3,7 +3,6 @@
 networks:
   johnny:
     external: true
-
   lagoon:
     external: true
 
@@ -21,9 +20,7 @@ services:
     networks:
       lagoon:
       johnny:
-        ipv4_address: 192.168.1.210
-    # ports:
-    #   - 8123:8123 #optional
+        ipv4_address: 192.168.1.7
     restart: unless-stopped
     labels:
       - falarie.groupby=iot

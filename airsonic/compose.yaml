@@ -24,7 +24,7 @@ services:
     networks:
       lagoon:
       johnny:
-        ipv4_address: 192.168.1.224
+        ipv4_address: 192.168.1.203
     # ports:
     #   - 4040:4040
     #   - 4041:4041
