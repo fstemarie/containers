@@ -4,41 +4,70 @@ networks:
   # docker network create -d macvlan --subnet=192.168.0.0/16 --gateway=192.168.0.1 -o macvlan_mode=bridge -o parent=enp1s0 johnny
   johnny:
     external: true
-  
   # docker network create --subnet=172.16.0.0/24 lagoon
   lagoon:
     external: true
-    # name: lagoon
-    # ipam:
-    #   config: [subnet: 172.16.0.0/24]
-
-volumes:
-  qb_keys:
 
 services:
+  nginx:
+    image: lscr.io/linuxserver/nginx:latest
+    container_name: nginx
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=America/Montreal
+    volumes:
+      - /data/containers/nginx:/config
+    networks:
+      lagoon:
+      johnny:
+        ipv4_address: 192.168.1.202
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=pirateisland
+
+  tailscale:
+    image: ghcr.io/tailscale/tailscale:latest
+    container_name: tailscale
+    depends_on: [nginx]
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+      - TS_HOSTNAME=pirate
+      - TS_AUTHKEY=tskey-auth-kJnjir3CNTRL-CgxejHhMaEJXuwoJx8ZpEJRXgYsQdnWDe
+      - TS_AUTH_ONCE=1
+      - TS_SOCKET=/var/run/tailscale/tailscaled.sock
+      - TS_USERSPACE=0
+      # - TS_EXTRA_ARGS=
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TZ=America/Montreal
+    volumes:
+      - "/data/containers/tailscale:/var/lib/tailscale"
+      - "/dev/net/tun:/dev/net/tun"
+      - "/var/run/dbus:/var/run/dbus"
+    network_mode: service:nginx
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=pirateisland
+
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent
     container_name: qbittorrent
-    hostname: qbittorrent
+    depends_on: [nginx]
     environment:
-      - PUID=989
-      - PGID=989
+      - PUID=984
+      - PGID=984
       - TZ=America/Montreal
       - UMASK=022
-      - WEBUI_PORT=80
+      - WEBUI_PORT=8080
     volumes:
       - /data/containers/qbittorrent:/config
       - /d/ruby/downloads:/downloads
       - /d/emerald:/emerald
       - /d/ruby:/ruby
       - /d/jade/files/torrents:/torrents
-    networks:
-      lagoon:
-      johnny:
-        ipv4_address: 192.168.1.220
-    # ports:
-    #   - 6881:6881
-    #   - 8080:8080
+    network_mode: service:nginx
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
@@ -46,7 +75,7 @@ services:
   radarr:
     image: lscr.io/linuxserver/radarr
     container_name: radarr
-    hostname: radarr
+    depends_on: [nginx]
     environment:
       - PUID=984
       - PGID=984
@@ -56,12 +85,7 @@ services:
       - /data/containers/radarr:/config
       - /l/backup/raktar/radarr:/config/backup
       - /d/emerald:/emerald
-    networks:
-      lagoon:
-      johnny:
-        ipv4_address: 192.168.1.221
-    # ports:
-    #   - 7878:7878
+    network_mode: service:nginx
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
@@ -69,7 +93,7 @@ services:
   sonarr:
     image: lscr.io/linuxserver/sonarr
     container_name: sonarr
-    hostname: sonarr
+    depends_on: [nginx]
     environment:
       - PUID=984
       - PGID=984
@@ -79,12 +103,21 @@ services:
       - /data/containers/sonarr:/config
       - /l/backup/raktar/sonarr:/config/Backups
       - /d/emerald:/emerald
-    networks:
-      lagoon:
-      johnny:
-        ipv4_address: 192.168.1.222
-    # ports:
-    #   - 8989:8989
+    network_mode: service:nginx
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=pirateisland
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=America/Montreal
+    volumes:
+      - /data/containers/prowlarr:/config
+    network_mode: service:nginx
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
@@ -92,21 +125,16 @@ services:
   jackett:
     image: lscr.io/linuxserver/jackett
     container_name: jackett
-    hostname: jackett
+    depends_on: [nginx]
     environment:
-      - PUID=988
-      - PGID=988
+      - PUID=1000
+      - PGID=100
       - TZ=America/Montreal
       - AUTO_UPDATE=false #optional
       #- RUN_OPTS=run options here #optional
     volumes:
       - /data/containers/jackett:/config
-    networks:
-      lagoon:
-      johnny:
-        ipv4_address: 192.168.1.223
-    # ports:
-    #   - 9117:9117
+    network_mode: service:nginx
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
@@ -114,26 +142,12 @@ services:
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr
     container_name: flaresolverr
-    hostname: flaresolverr
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - LOG_HTML=${LOG_HTML:-false}
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
       - TZ=America/Montreal
     networks: [lagoon]
-    # ports:
-    #   - 8191:8191
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
-
-# networks:
-#   johnny:
-#     name: johnny
-#     driver: macvlan
-#     driver_opts:
-#       parent: enp1s0
-#       macvlan_mode: bridge
-#     ipam:
-#       config:
-#         - subnet: 192.168.0.0/16
