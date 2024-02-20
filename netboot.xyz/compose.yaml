@@ -11,6 +11,7 @@ services:
   netbootxyz:
     image: lscr.io/linuxserver/netbootxyz
     container_name: netbootxyz
+    user: 1000:100
     environment:
       - PUID=1000
       - PGID=100
@@ -19,8 +20,8 @@ services:
       - PORT_RANGE=30000:30010 #optional
       - SUBFOLDER=/ #optional
     volumes:
-      - /data/container/netboox.xyz/config:/config
-      - /data/container/netboox.xyz/assets:/assets
+      - /data/containers/netboox.xyz/config:/config
+      - /data/containers/netboox.xyz/assets:/assets
     networks:
       lagoon:
       johnny:
