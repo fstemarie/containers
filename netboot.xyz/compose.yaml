@@ -3,7 +3,6 @@
 networks:
   johnny:
     external: true
-
   lagoon:
     external: true
 
@@ -25,7 +24,7 @@ services:
     networks:
       lagoon:
       johnny:
-        ipv4_address: 192.168.1.204
+        ipv4_address: 192.168.1.205
     # ports:
     #   - 3000:3000
     #   - 69:69/udp
