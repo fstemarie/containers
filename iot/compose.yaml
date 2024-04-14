@@ -6,6 +6,11 @@ networks:
   lagoon:
     external: true
 
+volumes:
+  homeassistant:
+  mosquitto:
+  nodered:
+
 services:
   homeassistant:
     image: lscr.io/linuxserver/homeassistant
@@ -15,12 +20,88 @@ services:
       - PGID=986
       - HA_PORT=80
       - TZ=America/Montreal
+      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
+      - TAILSCALE_STATE_DIR=/var/lib/tailscale
+      - TAILSCALE_SERVE_MODE=https
+      - TAILSCALE_SERVE_PORT=80
+      # - TAILSCALE_USE_SSH=1
+      - TAILSCALE_HOSTNAME=homeassistant
+      - TAILSCALE_AUTHKEY=tskey-auth-kaoLUgopP511CNTRL-BUNP6E8Cd6XzL5sHMyNs6XtJAeRSskee
+      - TAILSCALE_FUNNEL=on
     volumes:
-      - /data/containers/homeassistant:/config
+      - "homeassistant:/var/lib/tailscale"
+      - "/data/containers/homeassistant:/config"
     networks:
       lagoon:
+        aliases:
+          - "ha"
+      johnny:
+        ipv4_address: 192.168.1.6
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=iot
+
+  mosquitto:
+    image: docker.io/eclipse-mosquitto
+    container_name: mosquitto
+    volumes:
+      - mosquitto:/mosquitto/data
+      - /data/containers/mosquitto/config:/mosquitto/config
+      - /data/containers/mosquitto/log:/mosquitto/log
+    network_mode: service:homeassistant
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=iot
+
+
+
+  ts_nodered:
+    image: tailscale/tailscale:latest
+    container_name: ts_nodered
+    cap_add:
+      - net_admin
+      - sys_module
+    environment:
+      - TZ=America/Montreal
+      - TS_HOSTNAME=nodered
+      - TS_AUTHKEY=tskey-auth-kaoLUgopP511CNTRL-BUNP6E8Cd6XzL5sHMyNs6XtJAeRSskee
+      # - TS_EXTRA_ARGS=
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+      - "TS_SERVE_CONFIG=/config/serve.json"
+    volumes:
+      - nodered:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+      - ./serve:/config
+    networks:
+      lagoon:
+        aliases:
+          - "nr"
       johnny:
         ipv4_address: 192.168.1.7
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=iot
+
+  nodered:
+    image: docker.io/nodered/node-red
+    container_name: nodered
+    depends_on: [ts_nodered]
+    user: 1000:100
+    env_file:
+      - ~/secrets/nodered.env
+    environment:
+      - NODE_RED_HTTPADMINROOT=/admin
+      - NODE_RED_PORT=80
+      # - NODE_RED_PORT=443
+      # - NODE_RED_SSL_KEY=/data/ssl/nodered.iot.key.pem
+      # - NODE_RED_SSL_CERT=/data/ssl/nodered.iot.cert.pem
+      - TZ=America/Montreal
+    volumes:
+      - /data/containers/nodered:/data
+      - /d/ruby/audio/podcasts/:/podcasts
+      - /data/workspace:/workspace
+    network_mode: service:ts_nodered
     restart: unless-stopped
     labels:
       - falarie.groupby=iot
