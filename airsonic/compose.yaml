@@ -12,8 +12,8 @@ services:
     image: lscr.io/linuxserver/airsonic-advanced
     container_name: airsonic
     environment:
-      - PUID=985
-      - PGID=985
+      - PUID=984
+      - PGID=984
       - TZ=America/Montreal
       - "JAVA_OPTS=-Dserver.port=80"
       # - CONTEXT_PATH=/airsonic
@@ -24,7 +24,7 @@ services:
     networks:
       lagoon:
       johnny:
-        ipv4_address: 192.168.1.203
+        ipv4_address: 192.168.1.204
     # ports:
     #   - 4040:4040
     #   - 4041:4041
