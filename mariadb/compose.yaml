@@ -26,8 +26,10 @@ services:
       - /data/containers/mariadb:/config
     networks:
       lagoon:
+        aliases:
+          - "db"
       johnny:
-        ipv4_address: 192.168.1.200
+        ipv4_address: 192.168.1.4
     ports:
       - 3306:3306
     restart: unless-stopped
