@@ -48,7 +48,12 @@ services:
       - mosquitto:/mosquitto/data
       - /data/containers/mosquitto/config:/mosquitto/config
       - /data/containers/mosquitto/log:/mosquitto/log
-    network_mode: service:homeassistant
+    networks:
+      lagoon:
+        aliases:
+          - "msqt"
+      johnny:
+        ipv4_address: 192.168.1.7
     restart: unless-stopped
     labels:
       - falarie.groupby=iot
@@ -78,13 +83,13 @@ services:
         aliases:
           - "nr"
       johnny:
-        ipv4_address: 192.168.1.7
+        ipv4_address: 192.168.1.8
     restart: unless-stopped
     labels:
       - falarie.groupby=iot
 
   nodered:
-    image: docker.io/nodered/node-red
+    image: nodered/node-red:latest-18
     container_name: nodered
     depends_on: [ts_nodered]
     user: 1000:100
