@@ -27,7 +27,7 @@ services:
       - TAILSCALE_SERVE_PORT=80
       # - TAILSCALE_USE_SSH=1
       - TAILSCALE_HOSTNAME=qb
-      - TAILSCALE_AUTHKEY=tskey-auth-kaoLUgopP511CNTRL-BUNP6E8Cd6XzL5sHMyNs6XtJAeRSskee
+      - TAILSCALE_AUTHKEY=tskey-auth-kKoZMEUiEW11CNTRL-zfYCrHYF5wUoHJ3Ve3YsvUZi2bVN4nMM4
       # - TAILSCALE_FUNNEL=on
     volumes:
       - qbittorrent:/var/lib/tailscale
@@ -60,7 +60,7 @@ services:
       - TAILSCALE_SERVE_PORT=80
       # - TAILSCALE_USE_SSH=1
       - TAILSCALE_HOSTNAME=radarr
-      - TAILSCALE_AUTHKEY=tskey-auth-kaoLUgopP511CNTRL-BUNP6E8Cd6XzL5sHMyNs6XtJAeRSskee
+      - TAILSCALE_AUTHKEY=tskey-auth-kKoZMEUiEW11CNTRL-zfYCrHYF5wUoHJ3Ve3YsvUZi2bVN4nMM4
       #- TAILSCALE_FUNNEL=on
     volumes:
       - radarr:/var/lib/tailscale
@@ -91,7 +91,7 @@ services:
       - TAILSCALE_SERVE_PORT=80
       # - TAILSCALE_USE_SSH=1
       - TAILSCALE_HOSTNAME=sonarr
-      - TAILSCALE_AUTHKEY=tskey-auth-kaoLUgopP511CNTRL-BUNP6E8Cd6XzL5sHMyNs6XtJAeRSskee
+      - TAILSCALE_AUTHKEY=tskey-auth-kKoZMEUiEW11CNTRL-zfYCrHYF5wUoHJ3Ve3YsvUZi2bVN4nMM4
       #- TAILSCALE_FUNNEL=on
     volumes:
       - "sonarr:/var/lib/tailscale"
