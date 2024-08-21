@@ -1,0 +1,19 @@
+{
+    "TCP": {
+      "443": {
+        "HTTPS": true
+      }
+    },
+    "Web": {
+      "airsonic.sole-altair.ts.net:443": {
+        "Handlers": {
+          "/": {
+            "Proxy": "http://localhost:80"
+          }
+        }
+      }
+    },
+    "AllowFunnel": {
+      "airsonic.sole-altair.ts.net:443": true
+    }
+}
