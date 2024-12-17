@@ -1,0 +1,25 @@
+[francois]
+user: francois
+collection: .*
+permissions: RWrwDdOo
+
+[user]
+user: .+
+collection: {user}
+permissinos: rw
+
+[authenticated]
+user: .+
+collection:
+permissions: r
+
+[horaire_auth]
+user: .+
+collection: horaire
+permissions: rw
+
+[horaire]
+user: .*
+collection: horaire
+permissions: r
+

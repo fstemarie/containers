@@ -1,0 +1,60 @@
+networks:
+  lagoon:
+    external: true
+
+volumes:
+  radicale:
+  radicale_ts:
+
+services:
+  ts_radicale:
+    image: tailscale/tailscale
+    container_name: ts_radicale
+    cap_add:
+      - net_admin
+      - sys_module
+    environment:
+      - TZ=America/Montreal
+      - TS_HOSTNAME=radicale
+      - TS_AUTHKEY=tskey-auth-kkQnLrDJmC21CNTRL-BXXFB8NEf44EVMPXciQu44M6f1aFQysB9
+      - TS_EXTRA_ARGS=--accept-dns=false
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+      - TS_SERVE_CONFIG=/config/serve.json
+    volumes:
+      - radicale_ts:/var/lib/tailscale
+      - ./ts_radicale:/config
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    networks:
+      - lagoon
+    restart: unless-stopped
+
+  radicale:
+    image: tomsquest/docker-radicale
+    container_name: radicale
+    depends_on: [ts_radicale]
+    user: 1000:100
+    init: true
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETUID
+      - SETGID
+      - CHOWN
+      - KILL
+    healthcheck:
+      test: curl -f http://127.0.0.1:5232 || exit 1
+      interval: 30s
+      retries: 3
+    environment:
+      - TAKE_FILE_OWNERSHIP=false
+    network_mode: service:ts_radicale
+    volumes:
+      - ./radicale:/config
+      - radicale:/data
+      # - /data/containers/radicale/data:/data
+    restart: unless-stopped
