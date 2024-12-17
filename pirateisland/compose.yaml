@@ -7,35 +7,37 @@ networks:
     external: true
 
 volumes:
-  qbittorrent:
-  radarr:
-  sonarr:
+  qbittorrent_ts:
+  radarr_ts:
+  sonarr_ts:
 
 services:
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent
     container_name: qbittorrent
+    privileged: true
     environment:
       - PUID=984
       - PGID=984
       - TZ=America/Montreal
       - UMASK=022
       - WEBUI_PORT=80
-      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
+      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main|ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
       - TAILSCALE_STATE_DIR=/var/lib/tailscale
       - TAILSCALE_SERVE_MODE=https
       - TAILSCALE_SERVE_PORT=80
-      # - TAILSCALE_USE_SSH=1
       - TAILSCALE_HOSTNAME=qb
-      - TAILSCALE_AUTHKEY=tskey-auth-kKoZMEUiEW11CNTRL-zfYCrHYF5wUoHJ3Ve3YsvUZi2bVN4nMM4
-      # - TAILSCALE_FUNNEL=on
+      - TAILSCALE_AUTHKEY=tskey-auth-kkQnLrDJmC21CNTRL-BXXFB8NEf44EVMPXciQu44M6f1aFQysB9
     volumes:
-      - qbittorrent:/var/lib/tailscale
+      - /lib/modules:/lib/modules
+      - qbittorrent_ts:/var/lib/tailscale
       - /data/containers/qbittorrent:/config
+      - /d/ruby:/ruby
       - /d/ruby/downloads:/downloads
       - /d/emerald:/emerald
-      - /d/ruby:/ruby
       - /d/jade/files/torrents:/torrents
+    devices:
+      - /dev/net/tun:/dev/net/tun
     networks:
       lagoon:
         aliases:
@@ -49,6 +51,7 @@ services:
   radarr:
     image: lscr.io/linuxserver/radarr
     container_name: radarr
+    privileged: true
     environment:
       - PUID=984
       - PGID=984
@@ -58,19 +61,18 @@ services:
       - TAILSCALE_STATE_DIR=/var/lib/tailscale
       - TAILSCALE_SERVE_MODE=https
       - TAILSCALE_SERVE_PORT=80
-      # - TAILSCALE_USE_SSH=1
       - TAILSCALE_HOSTNAME=radarr
-      - TAILSCALE_AUTHKEY=tskey-auth-kKoZMEUiEW11CNTRL-zfYCrHYF5wUoHJ3Ve3YsvUZi2bVN4nMM4
-      #- TAILSCALE_FUNNEL=on
+      - TAILSCALE_AUTHKEY=tskey-auth-kkQnLrDJmC21CNTRL-BXXFB8NEf44EVMPXciQu44M6f1aFQysB9
     volumes:
-      - radarr:/var/lib/tailscale
+      - /lib/modules:/lib/modules
+      - radarr_ts:/var/lib/tailscale
       - /data/containers/radarr:/config
       - /l/backup/raktar/radarr:/config/backup
       - /d/emerald:/emerald
+    devices:
+      - /dev/net/tun:/dev/net/tun
     networks:
       lagoon:
-        aliases:
-          - "rdr"
       johnny:
         ipv4_address: 192.168.1.201
     restart: unless-stopped
@@ -80,6 +82,7 @@ services:
   sonarr:
     image: lscr.io/linuxserver/sonarr
     container_name: sonarr
+    privileged: true
     environment:
       - PUID=984
       - PGID=984
@@ -89,19 +92,18 @@ services:
       - TAILSCALE_STATE_DIR=/var/lib/tailscale
       - TAILSCALE_SERVE_MODE=https
       - TAILSCALE_SERVE_PORT=80
-      # - TAILSCALE_USE_SSH=1
       - TAILSCALE_HOSTNAME=sonarr
-      - TAILSCALE_AUTHKEY=tskey-auth-kKoZMEUiEW11CNTRL-zfYCrHYF5wUoHJ3Ve3YsvUZi2bVN4nMM4
-      #- TAILSCALE_FUNNEL=on
+      - TAILSCALE_AUTHKEY=tskey-auth-kkQnLrDJmC21CNTRL-BXXFB8NEf44EVMPXciQu44M6f1aFQysB9
     volumes:
-      - "sonarr:/var/lib/tailscale"
-      - "/data/containers/sonarr:/config"
-      - "/l/backup/raktar/sonarr:/config/Backups"
-      - "/d/emerald:/emerald"
+      - /lib/modules:/lib/modules
+      - sonarr_ts:/var/lib/tailscale
+      - /data/containers/sonarr:/config
+      - /l/backup/raktar/sonarr:/config/Backups
+      - /d/emerald:/emerald
+    devices:
+      - /dev/net/tun:/dev/net/tun
     networks:
       lagoon:
-        aliases:
-          - "snr"
       johnny:
         ipv4_address: 192.168.1.202
     restart: unless-stopped
@@ -122,8 +124,6 @@ services:
       - /d/jade/files/torrents:/torrents
     networks:
       lagoon:
-        aliases:
-          - "jckt"
       johnny:
         ipv4_address: 192.168.1.203
     restart: unless-stopped
