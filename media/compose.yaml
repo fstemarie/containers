@@ -1,0 +1,151 @@
+---
+
+networks:
+  johnny:
+    external: true
+  lagoon:
+    external: true
+
+volumes:
+  airsonic_ts:
+  ombi_ts:
+
+services:
+  airsonic:
+    image: lscr.io/linuxserver/airsonic-advanced
+    container_name: airsonic
+    privileged: true
+    environment:
+      - PUID=984
+      - PGID=984
+      - TZ=America/Montreal
+      - "JAVA_OPTS=-Dserver.port=80"
+      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
+      - TAILSCALE_STATE_DIR=/var/lib/tailscale
+      - TAILSCALE_SERVE_MODE=https
+      - TAILSCALE_SERVE_PORT=80
+      - TAILSCALE_HOSTNAME=airsonic
+      - TAILSCALE_AUTHKEY=tskey-auth-kkQnLrDJmC21CNTRL-BXXFB8NEf44EVMPXciQu44M6f1aFQysB9
+      - TAILSCALE_FUNNEL=on
+    volumes:
+      - "airsonic_ts:/var/lib/tailscale"
+      - /data/containers/airsonic:/config
+      - /d/ruby/audio:/audio
+      - /d/ruby/audio/playlists:/playlists
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    networks:
+      lagoon:
+      johnny:
+        ipv4_address: 192.168.1.204
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=media
+
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    environment:
+      - PUID=984 # homemedia
+      - PGID=984 # homemedia
+      - TZ=America/Montreal
+      - VERSION=docker
+    volumes:
+      - "/data/containers/plex:/config"
+      - "/l/video/documentaries:/media/documentaries"
+      - "/l/video/miniseries:/media/miniseries"
+      - "/l/video/tvshows:/media/tv"
+      - "/l/video/movies:/media/movies"
+      - "/l/video/movies-michelle:/media/movies-michelle"
+      - "/l/video/ufc:/media/ufc"
+      - "/l/audio/library:/media/audio"
+    network_mode: host
+    devices:
+      - /dev/dri:/dev/dri
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=media
+
+  ombi:
+    image: lscr.io/linuxserver/ombi:latest
+    container_name: ombi
+    privileged: true
+    environment:
+      - PUID=984 # homemedia
+      - PGID=984 # homemedia
+      - TZ=America/Montreal
+      - BASE_URL=/ #optional
+      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
+      - TAILSCALE_STATE_DIR=/var/lib/tailscale
+      - TAILSCALE_SERVE_MODE=https
+      - TAILSCALE_SERVE_PORT=3579
+      - TAILSCALE_HOSTNAME=ombi
+      - TAILSCALE_AUTHKEY=tskey-auth-kkQnLrDJmC21CNTRL-BXXFB8NEf44EVMPXciQu44M6f1aFQysB9
+      - TAILSCALE_FUNNEL=on
+    networks:
+      lagoon:
+      johnny:
+        ipv4_address: 192.168.1.206
+    volumes:
+      - "ombi_ts:/var/lib/tailscale"
+      - "/data/containers/ombi:/config"
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=media
+
+  # samsung-tvplus:
+  #   image: matthuisman/samsung-tvplus-for-channels
+  #   container_name: samsung-tvplus
+  #   environment:
+  #     - "REGION=us"
+  #   networks:
+  #     lagoon:
+  #       aliases:
+  #         - "stv"
+  #   ports:
+  #     - 8182:80
+  #   restart: unless-stopped
+  #   labels:
+  #     - falarie.groupby=media
+
+  # jellyfin:
+  #   image: lscr.io/linuxserver/jellyfin:latest
+  #   container_name: jellyfin
+  #   environment:
+  #     - PUID=984 # homemedia
+  #     - PGID=984 # homemedia
+  #     - TZ=America/Montreal
+  #     - JELLYFIN_PublishedServerUrl=jellyfin.sole-altair.ts.net #optional
+  #     - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
+  #     - TAILSCALE_STATE_DIR=/var/lib/tailscale
+  #     - TAILSCALE_SERVE_MODE=https
+  #     - TAILSCALE_SERVE_PORT=8096
+  #     - TAILSCALE_HOSTNAME=jellyfin
+  #     - TAILSCALE_AUTHKEY=tskey-auth-kkQnLrDJmC21CNTRL-BXXFB8NEf44EVMPXciQu44M6f1aFQysB9
+  #     - TAILSCALE_FUNNEL=on
+  #   volumes:
+  #     - "jellyfin_ts:/var/lib/tailscale"
+  #     - "/data/containers/jellyfin:/config"
+  #     - "/l/video/documentaries:/data/documentaries"
+  #     - "/l/video/miniseries:/data/miniseries"
+  #     - "/l/video/tvshows:/data/tvshows"
+  #     - "/l/video/movies:/data/movies"
+  #     - "/l/video/ufc:/data/ufc"
+  #     - "/l/audio/library:/data/audio"
+  #     - "/data/workspace/iptv:/data/iptv"
+  #   networks:
+  #     lagoon:
+  #     johnny:
+  #       ipv4_address: 192.168.1.205
+  #   # ports:
+  #   #   - 8096:8096
+  #   #   - 8920:8920 #optional
+  #   #   - 7359:7359/udp #optional
+  #   #   - 1900:1900/udp #optional
+  #   devices:
+  #     - /dev/dri:/dev/dri
+  #   restart: unless-stopped
+  #   labels:
+  #     - falarie.groupby=media
