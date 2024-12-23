@@ -52,13 +52,8 @@ services:
       - VERSION=docker
     volumes:
       - /data/containers/plex:/config
-      - /l/video/documentaries:/media/documentaries
-      - /l/video/miniseries:/media/miniseries
-      - /l/video/tvshows:/media/tv
-      - /l/video/movies:/media/movies
-      - /l/video/movies-michelle:/media/movies-michelle
-      - /l/video/ufc:/media/ufc
-      - /l/audio/library:/media/audio"
+      - /l/video:/media
+      - /l/audio/library:/media/audio
     network_mode: host
     devices:
       - /dev/dri:/dev/dri
