@@ -1,0 +1,24 @@
+appdaemon:
+  latitude: 0
+  longitude: 0
+  elevation: 30
+  time_zone: America/Montreal
+  plugins:
+    HASS:
+      type: hass
+      ha_url: http://localhost:80
+      token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIzMzMyM2Y5NGMyMjg0MzlhYmZkZGNhYzNkOTJmYWEwMiIsImlhdCI6MTczNTY5OTkxNSwiZXhwIjoyMDUxMDU5OTE1fQ.IbQOoigaz9q2UvnSZvmOKUUpO71WycXhrRpZaywLzfQ
+      cert_verify: True
+    MQTT:
+      type: mqtt
+      namespace: mqtt
+      client_host: msqt
+      client_port: 1883
+      client_id: appdaemon
+      client_user: appdaemon
+      client_password: !secret msqt_pass
+http:
+  url: http://homeassistant.iot:5050
+admin:
+api:
+hadashboard:

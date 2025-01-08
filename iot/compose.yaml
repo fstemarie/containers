@@ -31,10 +31,10 @@ services:
       - TAILSCALE_AUTHKEY=tskey-auth-kkQnLrDJmC21CNTRL-BXXFB8NEf44EVMPXciQu44M6f1aFQysB9
       - TAILSCALE_FUNNEL=on
     volumes:
-      - /lib/modules:/lib/modules
       - homeassistant_ts:/var/lib/tailscale
-      - /data/containers/homeassistant:/config
+      - /data/containers/appdaemon/apps:/config/appdaemon/apps
       - /l/backup/raktar/homeassistant:/config/backups
+      - /data/containers/homeassistant:/config
     devices:
       - /dev/net/tun:/dev/net/tun
     networks:
@@ -60,6 +60,24 @@ services:
           - "msqt"
       johnny:
         ipv4_address: 192.168.1.7
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=iot
+
+  appdaemon:
+    image: acockburn/appdaemon:latest
+    container_name: appdaemon
+    depends_on: [homeassistant, mosquitto]
+    user: 986:986
+    environment:
+      - HA_URL=http://localhost:80
+      - TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIzMzMyM2Y5NGMyMjg0MzlhYmZkZGNhYzNkOTJmYWEwMiIsImlhdCI6MTczNTY5OTkxNSwiZXhwIjoyMDUxMDU5OTE1fQ.IbQOoigaz9q2UvnSZvmOKUUpO71WycXhrRpZaywLzfQ
+      - DASH_URL=http://homeassistant.iot:5050
+    volumes:
+      - /data/containers/appdaemon:/conf
+      - ./appdaemon/appdaemon.yaml:/conf/appdaemon.yaml
+      - ./appdaemon/secrets.yaml:/conf/secrets.yaml
+    network_mode: service:homeassistant
     restart: unless-stopped
     labels:
       - falarie.groupby=iot
