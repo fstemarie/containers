@@ -243,7 +243,8 @@ module.exports = {
     //httpStatic: '/home/nol/node-red-static/', //single static source
     /* OR multiple static sources can be created using an array of objects... */
     httpStatic: [
-        {path: '/workspace/iptv/', root: "/iptv/"} 
+        {path: '/workspace/www/', root: '/'},
+        {path: '/workspace/iptv/', root: '/iptv/'} 
     ],
 
     /**  
