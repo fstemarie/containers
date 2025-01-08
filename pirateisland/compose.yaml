@@ -29,9 +29,9 @@ services:
       - TAILSCALE_HOSTNAME=qb
       - TAILSCALE_AUTHKEY=tskey-auth-kkQnLrDJmC21CNTRL-BXXFB8NEf44EVMPXciQu44M6f1aFQysB9
     volumes:
-      - /lib/modules:/lib/modules
       - qbittorrent_ts:/var/lib/tailscale
       - /data/containers/qbittorrent:/config
+      - ./qb/notify.sh:/config/notify.sh:ro
       - /d/ruby:/ruby
       - /d/ruby/downloads:/downloads
       - /d/emerald:/emerald
@@ -64,7 +64,6 @@ services:
       - TAILSCALE_HOSTNAME=radarr
       - TAILSCALE_AUTHKEY=tskey-auth-kkQnLrDJmC21CNTRL-BXXFB8NEf44EVMPXciQu44M6f1aFQysB9
     volumes:
-      - /lib/modules:/lib/modules
       - radarr_ts:/var/lib/tailscale
       - /data/containers/radarr:/config
       - /l/backup/raktar/radarr:/config/backup
@@ -95,7 +94,6 @@ services:
       - TAILSCALE_HOSTNAME=sonarr
       - TAILSCALE_AUTHKEY=tskey-auth-kkQnLrDJmC21CNTRL-BXXFB8NEf44EVMPXciQu44M6f1aFQysB9
     volumes:
-      - /lib/modules:/lib/modules
       - sonarr_ts:/var/lib/tailscale
       - /data/containers/sonarr:/config
       - /l/backup/raktar/sonarr:/config/Backups
