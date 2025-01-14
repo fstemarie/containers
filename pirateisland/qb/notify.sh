@@ -20,7 +20,6 @@ done
 
 json="
 {
-  \"server\":     \"qb.home\",
   \"event\":      \"$event\",
   \"id\":         \"$id\",
   \"name\":       \"$name\",
@@ -38,4 +37,4 @@ json="
 curl -X POST \
   -H "Content-Type: application/json" \
   -d "$json" \
-  http://nr/webhooks/raktar_qb
+  http://nr/wh/qb
