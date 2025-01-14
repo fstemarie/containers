@@ -68,8 +68,7 @@ htpasswd_filename = /config/users
 # Value: plain | bcrypt | md5 | sha256 | sha512 | autodetect
 # bcrypt requires the installation of 'bcrypt' module.
 #htpasswd_encryption = md5
-#htpasswd_encryption = plain
-htpasswd_encryption = bcrypt
+htpasswd_encryption = autodetect
 
 # Incorrect authentication delay (seconds)
 #delay = 1
@@ -86,7 +85,7 @@ htpasswd_encryption = bcrypt
 # Rights backend
 # Value: none | authenticated | owner_only | owner_write | from_file
 #type = owner_only
-type = authenticated
+type = from_file
 
 # File for rights management from_file
 #file = /etc/radicale/rights

@@ -1,25 +1,19 @@
 [francois]
 user: francois
 collection: .*
-permissions: RWrwDdOo
+permissions: RrWwDO
 
-[user]
+[users]
 user: .+
-collection: {user}
-permissinos: rw
+collection: {user}.*
+permissions: RrWwDO
 
-[authenticated]
-user: .+
-collection:
-permissions: r
-
-[horaire_auth]
-user: .+
-collection: horaire
-permissions: rw
-
-[horaire]
+[all_root]
 user: .*
-collection: horaire
-permissions: r
+collection: 
+permissions: R
 
+[all_horaire]
+user: .*
+collection: horaire.*
+permissions: Rr
