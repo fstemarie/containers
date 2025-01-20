@@ -27,7 +27,7 @@ services:
       - TAILSCALE_SERVE_MODE=https
       - TAILSCALE_SERVE_PORT=80
       - TAILSCALE_HOSTNAME=homeassistant
-      - TAILSCALE_AUTHKEY=tskey-auth-kkQnLrDJmC21CNTRL-BXXFB8NEf44EVMPXciQu44M6f1aFQysB9
+      - TAILSCALE_AUTHKEY=tskey-auth-kR276wZd9421CNTRL-7nT2HNWVe3gz6DaFeo9u3g5daBGJKpLN
       - TAILSCALE_FUNNEL=on
     volumes:
       - homeassistant_ts:/var/lib/tailscale
@@ -41,7 +41,9 @@ services:
         aliases:
           - "ha"
       johnny:
-        ipv4_address: 192.168.1.6
+        ipv4_address: 192.168.2.210
+    extra_hosts:
+      - "host:192.168.2.192"
     restart: unless-stopped
     labels:
       - falarie.groupby=iot
@@ -58,7 +60,7 @@ services:
         aliases:
           - "msqt"
       johnny:
-        ipv4_address: 192.168.1.7
+        ipv4_address: 192.168.2.211
     restart: unless-stopped
     labels:
       - falarie.groupby=iot
@@ -90,7 +92,7 @@ services:
     environment:
       - TZ=America/Montreal
       - TS_HOSTNAME=nodered
-      - TS_AUTHKEY=tskey-auth-kkQnLrDJmC21CNTRL-BXXFB8NEf44EVMPXciQu44M6f1aFQysB9
+      - TS_AUTHKEY=tskey-auth-kR276wZd9421CNTRL-7nT2HNWVe3gz6DaFeo9u3g5daBGJKpLN
       - TS_EXTRA_ARGS=--accept-dns=false
       - TS_STATE_DIR=/var/lib/tailscale
       - TS_USERSPACE=false
@@ -105,7 +107,9 @@ services:
         aliases:
           - nr
       johnny:
-        ipv4_address: 192.168.1.8
+        ipv4_address: 192.168.2.212
+    extra_hosts:
+      - "host:192.168.2.192"
     restart: unless-stopped
     labels:
       - falarie.groupby=iot

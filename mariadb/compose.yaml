@@ -29,7 +29,7 @@ services:
         aliases:
           - "db"
       johnny:
-        ipv4_address: 192.168.1.4
+        ipv4_address: 192.168.2.193
     ports:
       - 3306:3306
     restart: unless-stopped

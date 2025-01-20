@@ -7,9 +7,9 @@ networks:
     external: true
 
 services:
-  netbootxyz:
+  netboot:
     image: lscr.io/linuxserver/netbootxyz
-    container_name: netbootxyz
+    container_name: netboot
     user: 1000:100
     environment:
       - PUID=1000
@@ -24,7 +24,6 @@ services:
     networks:
       lagoon:
       johnny:
-        ipv4_address: 192.168.1.9
     # ports:
     #   - 3000:3000
     #   - 69:69/udp
