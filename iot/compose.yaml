@@ -31,7 +31,8 @@ services:
       - TAILSCALE_FUNNEL=on
     volumes:
       - homeassistant_ts:/var/lib/tailscale
-      - ../../appdaemon:/conf/apps
+      - /data/containers/appdaemon/apps:/conf/apps
+      - /data/containers/appdaemon/dashboards:/conf/dashboards
       - /l/backup/raktar/homeassistant:/config/backups
       - /data/containers/homeassistant:/config
     devices:
@@ -76,9 +77,6 @@ services:
       - DASH_URL=http://homeassistant.iot:5050
     volumes:
       - /data/containers/appdaemon:/conf
-      - ../../appdaemon:/conf/apps
-      - ./appdaemon/appdaemon.yaml:/conf/appdaemon.yaml
-      - ./appdaemon/secrets.yaml:/conf/secrets.yaml
     network_mode: service:homeassistant
     restart: unless-stopped
     labels:
