@@ -11,7 +11,12 @@ permissions: RrWwDO
 [all_root]
 user: .*
 collection: 
-permissions: R
+permissions: Rr
+
+[phil_horaire]
+user: philippe
+collection: horaire.*
+permissions: RrWw
 
 [all_horaire]
 user: .*
