@@ -3,7 +3,6 @@ networks:
     external: true
 
 volumes:
-  radicale:
   radicale_ts:
 
 services:
@@ -34,27 +33,26 @@ services:
     image: tomsquest/docker-radicale
     container_name: radicale
     depends_on: [ts_radicale]
-    user: 1000:100
-    init: true
-    read_only: true
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add:
-      - SETUID
-      - SETGID
-      - CHOWN
-      - KILL
+    # user: 1000:100
+    # init: true
+    # read_only: true
+    # security_opt:
+    #   - no-new-privileges:true
+    # cap_drop:
+    #   - ALL
+    # cap_add:
+    #   - SETUID
+    #   - SETGID
+    #   - CHOWN
+    #   - KILL
     healthcheck:
       test: curl -f http://127.0.0.1:5232 || exit 1
       interval: 5m
       retries: 3
-    environment:
-      - TAKE_FILE_OWNERSHIP=false
+    # environment:
+    #   - TAKE_FILE_OWNERSHIP=false
     network_mode: service:ts_radicale
     volumes:
       - ./radicale:/config
-      - radicale:/data
-      # - /data/containers/radicale/data:/data
+      - /data/containers/radicale/data:/data/collections
     restart: unless-stopped
