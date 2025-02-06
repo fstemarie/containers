@@ -18,13 +18,46 @@ while getopts "e:k:n:l:g:f:r:c:z:t:i:j:-" opt; do
   [ "$opt" = "j" ] && hashv2=$OPTARG
 done
 
+tags=$(echo $tags | tr -d " " | tr "," " ")
+tags=($tags)
+
+if [ "${category[@]: -2}" = "_m" ]; then
+    tags+=("michelle_1978")
+    [ $category = "movies_m" ] && category="movies"
+    [ $category = "tvshows_m" ] && category="tvshows"
+
+    curl \
+        --header "Content-Type: application/x-www-form-urlencoded" \
+        --data "category=${category}&hashes=${hashv1}" \
+        http://localhost/api/v2/torrents/setCategory
+
+    curl \
+        --header "Content-Type: application/x-www-form-urlencoded" \
+        --data "tags=michelle_1978&hashes=${hashv1}" \
+        http://localhost/api/v2/torrents/addTags
+fi
+
+if [ ${#tags[@]} -eq 0 ]; then
+    tags_json = "[]"
+elif [ ${#tags[@]} -eq 1 ]; then
+    tags_json="[ \"${tags[0]}\" ]"
+else
+    tags_json="[ \"${tags[0]}\""
+    for tag in "${tags[@]:1}"
+    do
+        tags_json="${tags_json}, \"$tag\""
+    done
+    tags_json="${tags_json} ]"
+fi
+
+
 json="
 {
   \"event\":      \"$event\",
   \"id\":         \"$id\",
   \"name\":       \"$name\",
   \"category\":   \"$category\",
-  \"tags\":       \"$tags\",
+  \"tags\":       $tags_json,
   \"files\":      \"$files\",
   \"root\":       \"$root\",
   \"numfiles\":   \"$numfiles\",
