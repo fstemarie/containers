@@ -37,17 +37,14 @@ if [ "${category[@]: -2}" = "_m" ]; then
         http://localhost/api/v2/torrents/addTags
 fi
 
-if [ ${#tags[@]} -eq 0 ]; then
-    tags_json = "[]"
-elif [ ${#tags[@]} -eq 1 ]; then
-    tags_json="[ \"${tags[0]}\" ]"
+if [ ${#tags[@]} -lt 1 ]; then
+    tags_json = ""
 else
-    tags_json="[ \"${tags[0]}\""
+    tags_json="\"${tags[0]}\""
     for tag in "${tags[@]:1}"
     do
         tags_json="${tags_json}, \"$tag\""
     done
-    tags_json="${tags_json} ]"
 fi
 
 
@@ -57,7 +54,7 @@ json="
   \"id\":         \"$id\",
   \"name\":       \"$name\",
   \"category\":   \"$category\",
-  \"tags\":       $tags_json,
+  \"tags\":       [ $tags_json ],
   \"files\":      \"$files\",
   \"root\":       \"$root\",
   \"numfiles\":   \"$numfiles\",
