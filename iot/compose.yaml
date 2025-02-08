@@ -31,10 +31,10 @@ services:
       - TAILSCALE_FUNNEL=on
     volumes:
       - homeassistant_ts:/var/lib/tailscale
+      - /data/containers/homeassistant:/config
+      - /l/backup/raktar/homeassistant:/config/backups
       - /data/containers/appdaemon/apps:/conf/apps
       - /data/containers/appdaemon/dashboards:/conf/dashboards
-      - /l/backup/raktar/homeassistant:/config/backups
-      - /data/containers/homeassistant:/config
     devices:
       - /dev/net/tun:/dev/net/tun
     networks:
