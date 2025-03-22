@@ -74,7 +74,7 @@ services:
       - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
       - TAILSCALE_STATE_DIR=/var/lib/tailscale
       - TAILSCALE_SERVE_MODE=https
-      - TAILSCALE_SERVE_PORT=8096
+      - TAILSCALE_SERVE_PORT=80
       - TAILSCALE_HOSTNAME=jellyfin
       - TAILSCALE_FUNNEL=on
     volumes:
@@ -93,29 +93,8 @@ services:
       lagoon:
       johnny:
         ipv4_address: 192.168.2.204
-    # ports:
-    #   - 8096:8096
-    #   - 8920:8920 #optional
-    #   - 7359:7359/udp #optional
-    #   - 1900:1900/udp #optional
     devices:
       - /dev/dri:/dev/dri
     restart: unless-stopped
     labels:
       - falarie.groupby=media
-
-
-  # samsung-tvplus:
-  #   image: matthuisman/samsung-tvplus-for-channels
-  #   container_name: samsung-tvplus
-  #   environment:
-  #     - REGION=us
-  #   networks:
-  #     lagoon:
-  #       aliases:
-  #         - "stv"
-  #   ports:
-  #     - 8182:80
-  #   restart: unless-stopped
-  #   labels:
-  #     - falarie.groupby=media
