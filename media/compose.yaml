@@ -9,12 +9,14 @@ networks:
 volumes:
   airsonic_ts:
   ombi_ts:
+  jellyfin_ts:
 
 services:
   airsonic:
     image: lscr.io/linuxserver/airsonic-advanced
     container_name: airsonic
     privileged: true
+    env_file: ../tskey.env
     environment:
       - PUID=984
       - PGID=984
@@ -25,7 +27,6 @@ services:
       - TAILSCALE_SERVE_MODE=https
       - TAILSCALE_SERVE_PORT=80
       - TAILSCALE_HOSTNAME=airsonic
-      - TAILSCALE_AUTHKEY=tskey-auth-kR276wZd9421CNTRL-7nT2HNWVe3gz6DaFeo9u3g5daBGJKpLN
       - TAILSCALE_FUNNEL=on
     volumes:
       - airsonic_ts:/var/lib/tailscale
@@ -61,6 +62,49 @@ services:
     labels:
       - falarie.groupby=media
 
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    env_file: ../tskey.env
+    environment:
+      - PUID=984 # homemedia
+      - PGID=984 # homemedia
+      - TZ=America/Montreal
+      - JELLYFIN_PublishedServerUrl=jellyfin.sole-altair.ts.net #optional
+      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
+      - TAILSCALE_STATE_DIR=/var/lib/tailscale
+      - TAILSCALE_SERVE_MODE=https
+      - TAILSCALE_SERVE_PORT=8096
+      - TAILSCALE_HOSTNAME=jellyfin
+      - TAILSCALE_FUNNEL=on
+    volumes:
+      - jellyfin_ts:/var/lib/tailscale
+      - /data/containers/jellyfin:/config
+      - /l/video/documentaries:/data/documentaries
+      - /l/video/miniseries:/data/miniseries
+      - /l/video/tvshows:/data/tvshows
+      - /l/video/tvshows-michelle:/data/tvshows-michelle
+      - /l/video/movies:/data/movies
+      - /l/video/movies-michelle:/data/movies-michelle
+      - /l/video/ufc:/data/ufc
+      - /l/audio/library:/data/audio
+      - /data/workspace/iptv:/data/iptv
+    networks:
+      lagoon:
+      johnny:
+        ipv4_address: 192.168.2.204
+    # ports:
+    #   - 8096:8096
+    #   - 8920:8920 #optional
+    #   - 7359:7359/udp #optional
+    #   - 1900:1900/udp #optional
+    devices:
+      - /dev/dri:/dev/dri
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=media
+
+
   # samsung-tvplus:
   #   image: matthuisman/samsung-tvplus-for-channels
   #   container_name: samsung-tvplus
@@ -72,46 +116,6 @@ services:
   #         - "stv"
   #   ports:
   #     - 8182:80
-  #   restart: unless-stopped
-  #   labels:
-  #     - falarie.groupby=media
-
-  # jellyfin:
-  #   image: lscr.io/linuxserver/jellyfin:latest
-  #   container_name: jellyfin
-  #   environment:
-  #     - PUID=984 # homemedia
-  #     - PGID=984 # homemedia
-  #     - TZ=America/Montreal
-  #     - JELLYFIN_PublishedServerUrl=jellyfin.sole-altair.ts.net #optional
-  #     - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
-  #     - TAILSCALE_STATE_DIR=/var/lib/tailscale
-  #     - TAILSCALE_SERVE_MODE=https
-  #     - TAILSCALE_SERVE_PORT=8096
-  #     - TAILSCALE_HOSTNAME=jellyfin
-  #     - TAILSCALE_AUTHKEY=tskey-auth-kkQnLrDJmC21CNTRL-BXXFB8NEf44EVMPXciQu44M6f1aFQysB9
-  #     - TAILSCALE_FUNNEL=on
-  #   volumes:
-  #     - jellyfin_ts:/var/lib/tailscale
-  #     - /data/containers/jellyfin:/config
-  #     - /l/video/documentaries:/data/documentaries
-  #     - /l/video/miniseries:/data/miniseries
-  #     - /l/video/tvshows:/data/tvshows
-  #     - /l/video/movies:/data/movies
-  #     - /l/video/ufc:/data/ufc
-  #     - /l/audio/library:/data/audio
-  #     - /data/workspace/iptv:/data/iptv
-  #   networks:
-  #     lagoon:
-  #     johnny:
-  #       ipv4_address: 192.168.1.300
-  #   # ports:
-  #   #   - 8096:8096
-  #   #   - 8920:8920 #optional
-  #   #   - 7359:7359/udp #optional
-  #   #   - 1900:1900/udp #optional
-  #   devices:
-  #     - /dev/dri:/dev/dri
   #   restart: unless-stopped
   #   labels:
   #     - falarie.groupby=media
