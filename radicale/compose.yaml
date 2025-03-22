@@ -12,10 +12,10 @@ services:
     cap_add:
       - net_admin
       - sys_module
+    env_file: ../tskey.env
     environment:
       - TZ=America/Montreal
       - TS_HOSTNAME=radicale
-      - TS_AUTHKEY=tskey-auth-kR276wZd9421CNTRL-7nT2HNWVe3gz6DaFeo9u3g5daBGJKpLN
       - TS_EXTRA_ARGS=--accept-dns=false
       - TS_STATE_DIR=/var/lib/tailscale
       - TS_USERSPACE=false

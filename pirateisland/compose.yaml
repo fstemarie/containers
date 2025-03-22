@@ -20,6 +20,7 @@ services:
     image: lscr.io/linuxserver/qbittorrent
     container_name: qbittorrent
     privileged: true
+    env_file: ../tskey.env
     environment:
       - PUID=984
       - PGID=984
@@ -31,7 +32,7 @@ services:
       - TAILSCALE_SERVE_MODE=https
       - TAILSCALE_SERVE_PORT=80
       - TAILSCALE_HOSTNAME=qb
-      - TAILSCALE_AUTHKEY=tskey-auth-kR276wZd9421CNTRL-7nT2HNWVe3gz6DaFeo9u3g5daBGJKpLN
+      # - TAILSCALE_AUTHKEY=${TSKEY}
     volumes:
       - qbittorrent_ts:/var/lib/tailscale
       - /data/containers/qbittorrent:/config
@@ -56,6 +57,7 @@ services:
     image: lscr.io/linuxserver/radarr
     container_name: radarr
     privileged: true
+    env_file: ../tskey.env
     environment:
       - PUID=984
       - PGID=984
@@ -66,7 +68,7 @@ services:
       - TAILSCALE_SERVE_MODE=https
       - TAILSCALE_SERVE_PORT=80
       - TAILSCALE_HOSTNAME=radarr
-      - TAILSCALE_AUTHKEY=tskey-auth-kR276wZd9421CNTRL-7nT2HNWVe3gz6DaFeo9u3g5daBGJKpLN
+      # - TAILSCALE_AUTHKEY=${TSKEY}
     volumes:
       - radarr_ts:/var/lib/tailscale
       - /data/containers/radarr:/config
@@ -86,6 +88,7 @@ services:
     image: lscr.io/linuxserver/sonarr
     container_name: sonarr
     privileged: true
+    env_file: ../tskey.env
     environment:
       - PUID=984
       - PGID=984
@@ -96,7 +99,7 @@ services:
       - TAILSCALE_SERVE_MODE=https
       - TAILSCALE_SERVE_PORT=80
       - TAILSCALE_HOSTNAME=sonarr
-      - TAILSCALE_AUTHKEY=tskey-auth-kR276wZd9421CNTRL-7nT2HNWVe3gz6DaFeo9u3g5daBGJKpLN
+      # - TAILSCALE_AUTHKEY=${TSKEY}
     volumes:
       - sonarr_ts:/var/lib/tailscale
       - /data/containers/sonarr:/config
@@ -135,6 +138,7 @@ services:
     image: lscr.io/linuxserver/ombi:latest
     container_name: ombi
     privileged: true
+    env_file: ../tskey.env
     environment:
       - PUID=984 # homemedia
       - PGID=984 # homemedia
@@ -145,8 +149,8 @@ services:
       - TAILSCALE_SERVE_MODE=https
       - TAILSCALE_SERVE_PORT=3579
       - TAILSCALE_HOSTNAME=ombi
-      - TAILSCALE_AUTHKEY=tskey-auth-kR276wZd9421CNTRL-7nT2HNWVe3gz6DaFeo9u3g5daBGJKpLN
       - TAILSCALE_FUNNEL=on
+      # - TAILSCALE_AUTHKEY=${TSKEY}
     networks:
       lagoon:
     volumes:

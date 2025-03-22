@@ -24,6 +24,7 @@ services:
       # - REMOTE_SQL=http://URL1/your.sql,https://URL2/your.sql #optional
     volumes:
       - /data/containers/mariadb:/config
+      - /l/backup/raktar/mariadb:/backup
     networks:
       lagoon:
         aliases:
