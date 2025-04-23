@@ -14,6 +14,7 @@ volumes:
   radarr_ts:
   sonarr_ts:
   ombi_ts:
+  prowlarr_ts:
 
 services:
   qbittorrent:
@@ -23,7 +24,7 @@ services:
     env_file: ../tskey.env
     environment:
       - PUID=984
-      - PGID=984
+      - PGID=100
       - TZ=America/Montreal
       - UMASK=022
       - WEBUI_PORT=80
@@ -32,7 +33,6 @@ services:
       - TAILSCALE_SERVE_MODE=https
       - TAILSCALE_SERVE_PORT=80
       - TAILSCALE_HOSTNAME=qb
-      # - TAILSCALE_AUTHKEY=${TSKEY}
     volumes:
       - qbittorrent_ts:/var/lib/tailscale
       - /data/containers/qbittorrent:/config
@@ -45,8 +45,7 @@ services:
       - /dev/net/tun:/dev/net/tun
     networks:
       lagoon:
-        aliases:
-          - "qb"
+        aliases: ["qb"]
       johnny:
         ipv4_address: 192.168.2.200
     restart: unless-stopped
@@ -60,7 +59,7 @@ services:
     env_file: ../tskey.env
     environment:
       - PUID=984
-      - PGID=984
+      - PGID=100
       - TZ=America/Montreal
       - UMASK=022 #optional
       - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
@@ -68,7 +67,6 @@ services:
       - TAILSCALE_SERVE_MODE=https
       - TAILSCALE_SERVE_PORT=80
       - TAILSCALE_HOSTNAME=radarr
-      # - TAILSCALE_AUTHKEY=${TSKEY}
     volumes:
       - radarr_ts:/var/lib/tailscale
       - /data/containers/radarr:/config
@@ -78,6 +76,7 @@ services:
       - /dev/net/tun:/dev/net/tun
     networks:
       lagoon:
+        aliases: ["rdr"]
       johnny:
         ipv4_address: 192.168.2.201
     restart: unless-stopped
@@ -91,7 +90,7 @@ services:
     env_file: ../tskey.env
     environment:
       - PUID=984
-      - PGID=984
+      - PGID=100
       - TZ=America/Montreal
       - UMASK=022 #optional
       - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
@@ -109,6 +108,7 @@ services:
       - /dev/net/tun:/dev/net/tun
     networks:
       lagoon:
+        aliases: ["snr"]
       johnny:
         ipv4_address: 192.168.2.202
     restart: unless-stopped
@@ -128,8 +128,34 @@ services:
       - /d/jade/files/torrents:/torrents
     networks:
       lagoon:
+        aliases: ["jkt"]
       johnny:
         ipv4_address: 192.168.2.203
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=pirateisland
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    env_file: ../tskey.env
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=America/Montreal
+      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
+      - TAILSCALE_STATE_DIR=/var/lib/tailscale
+      - TAILSCALE_SERVE_MODE=https
+      - TAILSCALE_SERVE_PORT=80
+      - TAILSCALE_HOSTNAME=prowlarr
+    volumes:
+      - prowlarr_ts:/var/lib/tailscale
+      - /data/containers/prowlarr:/config
+    networks:
+      lagoon:
+        aliases: ["prwlr"]
+      johnny:
+        ipv4_address: 192.168.2.205
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
@@ -141,7 +167,7 @@ services:
     env_file: ../tskey.env
     environment:
       - PUID=984 # homemedia
-      - PGID=984 # homemedia
+      - PGID=100 # homemedia
       - TZ=America/Montreal
       - BASE_URL=/ #optional
       - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
@@ -162,13 +188,13 @@ services:
     labels:
       - falarie.groupby=pirateisland
 
-  flaresolverr:
+  flaresolverr: # Port 8191
     image: ghcr.io/flaresolverr/flaresolverr
     container_name: flaresolverr
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - LOG_HTML=${LOG_HTML:-false}
-      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+      - CAPTCHA_SOLVER=hcaptcha-solver
       - TZ=America/Montreal
     networks:
       - lagoon
