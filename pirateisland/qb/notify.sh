@@ -21,7 +21,6 @@ while getopts "e:k:n:l:g:f:r:c:z:t:i:j:-" opt; do
   [ "$opt" = "i" ] && hashv1=$OPTARG
   [ "$opt" = "j" ] && hashv2=$OPTARG
 done
-hash=$( [ "$hashv2" = "-" ] && echo $hashv1 || echo $hashv2)
 
 # Split la string en array
 tags=$(echo $tags | tr "," " ")
@@ -37,7 +36,7 @@ if [ "${category[@]: -2}" = "_m" ]; then
     error=$(
         curl --silent \
         --header "Content-Type: application/x-www-form-urlencoded" \
-        --data "category=${category}&hashes=${hash}" \
+        --data "category=${category}&hashes=${id}" \
         http://localhost/api/v2/torrents/setCategory
     )
     if [ $? -ne 0 ]; then
@@ -46,7 +45,7 @@ if [ "${category[@]: -2}" = "_m" ]; then
     fi
 fi
 
-if [ "$category" == "movies" ] || [ "$category" == "tvshows" ]; then
+if [ "$category" == "movies" ] || [ "$category" == "tvshows" ] && [ "$event" = "added" ]; then
     tags+=($category) # Ajoute la categorie dans la liste des tags
     tags_str=$(IFS=, ; echo "${tags[*]}") # Join le array en string avec des virgules
 
@@ -54,7 +53,7 @@ if [ "$category" == "movies" ] || [ "$category" == "tvshows" ]; then
     error=$(
         curl --silent \
         --header "Content-Type: application/x-www-form-urlencoded" \
-        --data "tags=${tags_str}&hashes=${hash}" \
+        --data "tags=${tags_str}&hashes=${id}" \
         http://localhost/api/v2/torrents/addTags
     )
     if [ $? -ne 0 ]; then
@@ -63,13 +62,7 @@ if [ "$category" == "movies" ] || [ "$category" == "tvshows" ]; then
     fi
 fi
 
-if [ ${#tags[@]} -lt 1 ]; then
-    tags_json=""
-else
-    tags_json="\"$(echo ${tags[*]} | sed 's/ /\", \"/g')\""
-fi
-
-
+tags_json="\"$(echo ${tags[*]} | sed 's/ /\", \"/g')\""
 json="
 {
   \"event\":      \"$event\",
@@ -82,7 +75,6 @@ json="
   \"numfiles\":   \"$numfiles\",
   \"size\":       \"$size\",
   \"tracker\":    \"$tracker\",
-  \"hash\":       \"$hash\",
   \"hashv1\":     \"$hashv1\",
   \"hashv2\":     \"$hashv2\"
 }"
