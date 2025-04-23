@@ -3,12 +3,16 @@
 # /config/notify.sh -e "added" -k "%K" -n "%N" -l "%L" -g "%G" -f "%F" -r "%R" -c "%C" -z "%Z" -t "%T" -i "%I" -j "%J"
 # /config/notify.sh -e "finished" -k "%K" -n "%N" -l "%L" -g "%G" -f "%F" -r "%R" -c "%C" -z "%Z" -t "%T" -i "%I" -j "%J"
 
+echo "
+### $(date --iso-8601=seconds) ###
+### notify.sh script called with the following parameters: $*"
+
 while getopts "e:k:n:l:g:f:r:c:z:t:i:j:-" opt; do
   [ "$opt" = "e" ] && event=$OPTARG
   [ "$opt" = "k" ] && id=$OPTARG
-  [ "$opt" = "n" ] && name=$OPTARG
-  [ "$opt" = "l" ] && category=$OPTARG
-  [ "$opt" = "g" ] && tags=$OPTARG
+  [ "$opt" = "n" ] && name=$OPTARG && echo "### Name: $name"
+  [ "$opt" = "l" ] && category=$OPTARG && echo "### Category: $category"
+  [ "$opt" = "g" ] && tags=$OPTARG && echo "### Tags: $tags"
   [ "$opt" = "f" ] && files=$OPTARG
   [ "$opt" = "r" ] && root=$OPTARG
   [ "$opt" = "c" ] && numfiles=$OPTARG
@@ -17,34 +21,52 @@ while getopts "e:k:n:l:g:f:r:c:z:t:i:j:-" opt; do
   [ "$opt" = "i" ] && hashv1=$OPTARG
   [ "$opt" = "j" ] && hashv2=$OPTARG
 done
+hash=$( [ "$hashv2" = "-" ] && echo $hashv1 || echo $hashv2)
 
-tags=$(echo $tags | tr -d " " | tr "," " ")
+# Split la string en array
+tags=$(echo $tags | tr "," " ")
 tags=($tags)
 
+# Si le torrent a la categorie speciale pour les torrent de Michelle...
 if [ "${category[@]: -2}" = "_m" ]; then
-    tags+=("michelle_1978")
-    [ $category = "movies_m" ] && category="movies"
-    [ $category = "tvshows_m" ] && category="tvshows"
+    tags+=("michelle_1978") # Ajoute le nom de Michelle dans la liste des tags
+    [ $category == "movies_m" ] && category="movies"
+    [ $category == "tvshows_m" ] && category="tvshows"
 
-    curl \
+    # Change la categorie du torrent dans qbittorrent
+    error=$(
+        curl --silent \
         --header "Content-Type: application/x-www-form-urlencoded" \
-        --data "category=${category}&hashes=${hashv1}" \
+        --data "category=${category}&hashes=${hash}" \
         http://localhost/api/v2/torrents/setCategory
+    )
+    if [ $? -ne 0 ]; then
+        echo "### Error: $error"
+        exit 1
+    fi
+fi
 
-    curl \
+if [ "$category" == "movies" ] || [ "$category" == "tvshows" ]; then
+    tags+=($category) # Ajoute la categorie dans la liste des tags
+    tags_str=$(IFS=, ; echo "${tags[*]}") # Join le array en string avec des virgules
+
+    # Change les tags du torrent dans qbittorrent
+    error=$(
+        curl --silent \
         --header "Content-Type: application/x-www-form-urlencoded" \
-        --data "tags=michelle_1978&hashes=${hashv1}" \
+        --data "tags=${tags_str}&hashes=${hash}" \
         http://localhost/api/v2/torrents/addTags
+    )
+    if [ $? -ne 0 ]; then
+        echo "### Error: $error"
+        exit 1
+    fi
 fi
 
 if [ ${#tags[@]} -lt 1 ]; then
-    tags_json = ""
+    tags_json=""
 else
-    tags_json="\"${tags[0]}\""
-    for tag in "${tags[@]:1}"
-    do
-        tags_json="${tags_json}, \"$tag\""
-    done
+    tags_json="\"$(echo ${tags[*]} | sed 's/ /\", \"/g')\""
 fi
 
 
@@ -60,11 +82,21 @@ json="
   \"numfiles\":   \"$numfiles\",
   \"size\":       \"$size\",
   \"tracker\":    \"$tracker\",
+  \"hash\":       \"$hash\",
   \"hashv1\":     \"$hashv1\",
   \"hashv2\":     \"$hashv2\"
 }"
 
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -d "$json" \
-  http://nr/wh/qb
+echo "### JSON: ${json}"
+
+# Send the JSON to the webhook URL
+error=$(
+    curl --request POST --silent \
+    --header "Content-Type: application/json" \
+    --data "$json" \
+    http://nr/wh/qb
+)
+if [ $? -ne 0 ]; then
+    echo "### Error: $error"
+    exit 1
+fi
