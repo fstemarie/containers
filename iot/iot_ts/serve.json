@@ -5,12 +5,15 @@
       }
     },
     "Web": {
-      "nodered.sole-altair.ts.net:443": {
+      "homeassistant.sole-altair.ts.net:443": {
         "Handlers": {
           "/": {
-            "Proxy": "http://127.0.0.1:80"
+            "Proxy": "http://localhost:80"
           }
         }
       }
+    },
+    "AllowFunnel": {
+        "homeassistant.sole-altair.ts.net:443": true
     }
   }
