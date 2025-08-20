@@ -3,7 +3,6 @@
 networks:
   johnny:
     external: true
-
   lagoon:
     external: true
 
@@ -38,9 +37,7 @@ services:
       lagoon:
         aliases: ["db"]
       johnny:
-        ipv4_address: 192.168.2.193
-    ports:
-      - 3306:3306
+        ipv4_address: 192.168.2.200
     restart: unless-stopped
     labels:
       - falarie.groupby=database
