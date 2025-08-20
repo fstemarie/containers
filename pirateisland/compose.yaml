@@ -47,7 +47,7 @@ services:
       lagoon:
         aliases: ["qb"]
       johnny:
-        ipv4_address: 192.168.2.200
+        ipv4_address: 192.168.2.210
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
@@ -78,7 +78,7 @@ services:
       lagoon:
         aliases: ["rdr"]
       johnny:
-        ipv4_address: 192.168.2.201
+        ipv4_address: 192.168.2.211
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
@@ -110,7 +110,7 @@ services:
       lagoon:
         aliases: ["snr"]
       johnny:
-        ipv4_address: 192.168.2.202
+        ipv4_address: 192.168.2.212
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
