@@ -3,6 +3,9 @@
 # /config/notify.sh -e "added" -k "%K" -n "%N" -l "%L" -g "%G" -f "%F" -r "%R" -c "%C" -z "%Z" -t "%T" -i "%I" -j "%J"
 # /config/notify.sh -e "finished" -k "%K" -n "%N" -l "%L" -g "%G" -f "%F" -r "%R" -c "%C" -z "%Z" -t "%T" -i "%I" -j "%J"
 
+QB_URL="http://localhost"
+WH_URL="http://nr/wh/qb"
+
 echo "
 ### $(date --iso-8601=seconds) ###
 ### notify.sh script called with the following parameters: $*"
@@ -28,7 +31,7 @@ tags=($tags)
 
 # Si le torrent a la categorie speciale pour les torrent de Michelle...
 if [ "${category[@]: -2}" = "_m" ]; then
-    tags+=("michelle_1978") # Ajoute le nom de Michelle dans la liste des tags
+    tags+=("michelle") # Ajoute le nom de Michelle dans la liste des tags
     [ $category == "movies_m" ] && category="movies"
     [ $category == "tvshows_m" ] && category="tvshows"
 
@@ -54,7 +57,7 @@ if [ "$category" == "movies" ] || [ "$category" == "tvshows" ] && [ "$event" = "
         curl --silent \
         --header "Content-Type: application/x-www-form-urlencoded" \
         --data "tags=${tags_str}&hashes=${id}" \
-        http://localhost/api/v2/torrents/addTags
+        $QB_URL/api/v2/torrents/addTags
     )
     if [ $? -ne 0 ]; then
         echo "### Error: $error"
@@ -86,7 +89,7 @@ error=$(
     curl --request POST --silent \
     --header "Content-Type: application/json" \
     --data "$json" \
-    http://nr/wh/qb
+    $WH_URL
 )
 if [ $? -ne 0 ]; then
     echo "### Error: $error"
