@@ -7,15 +7,59 @@ networks:
     external: true
 
 volumes:
-  homeassistant_ts:
+  ts:
+  appdaemon:
   mosquitto:
-  nodered_ws: # workspace
-  nodered_ts:
 
 services:
+  iot_ts:
+    image: tailscale/tailscale
+    container_name: iot_ts
+    cap_add:
+      - net_admin
+      - sys_module
+    env_file: ../tskey.env
+    environment:
+      - TZ=America/Montreal
+      - TS_HOSTNAME=homeassistant
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+      - TS_SERVE_CONFIG=/config/serve.json
+    volumes:
+      - ts:/var/lib/tailscale
+      - ./iot_ts:/config
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    networks:
+      lagoon:
+        aliases: [iot, ad, nr, ha]
+      johnny:
+        ipv4_address: 192.168.2.201
+    extra_hosts:
+      - "host:192.168.2.192" # Raktar's IP
+      - "raktar:192.168.1.1" # Raktar's IP
+      - "filebox:192.168.1.2" # Filebox's IP
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=iot
+
+  mosquitto:
+    image: docker.io/eclipse-mosquitto
+    depends_on: [iot_ts]
+    container_name: mosquitto
+    volumes:
+      - mosquitto:/mosquitto/data
+      - /data/containers/mosquitto/config:/mosquitto/config
+      - /data/containers/mosquitto/log:/mosquitto/log
+    network_mode: service:iot_ts
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=iot
+
   homeassistant:
     image: lscr.io/linuxserver/homeassistant
     container_name: homeassistant
+    depends_on: [iot_ts, mosquitto]
     privileged: true
     env_file: ../tskey.env
     environment:
@@ -23,45 +67,12 @@ services:
       - PGID=986
       - HA_PORT=80
       - TZ=America/Montreal
-      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
-      - TAILSCALE_STATE_DIR=/var/lib/tailscale
-      - TAILSCALE_SERVE_MODE=https
-      - TAILSCALE_SERVE_PORT=80
-      - TAILSCALE_HOSTNAME=homeassistant
-      - TAILSCALE_FUNNEL=on
     volumes:
-      - homeassistant_ts:/var/lib/tailscale
       - /data/containers/homeassistant:/config
       - /l/backup/raktar/homeassistant:/config/backups
       - /data/containers/appdaemon/apps:/conf/apps
       - /data/containers/appdaemon/dashboards:/conf/dashboards
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    networks:
-      lagoon:
-        aliases:
-          - "ha"
-      johnny:
-        ipv4_address: 192.168.2.210
-    extra_hosts:
-      - "host:192.168.2.192"
-    restart: unless-stopped
-    labels:
-      - falarie.groupby=iot
-
-  mosquitto:
-    image: docker.io/eclipse-mosquitto
-    container_name: mosquitto
-    volumes:
-      - mosquitto:/mosquitto/data
-      - /data/containers/mosquitto/config:/mosquitto/config
-      - /data/containers/mosquitto/log:/mosquitto/log
-    networks:
-      lagoon:
-        aliases:
-          - "msqt"
-      johnny:
-        ipv4_address: 192.168.2.211
+    network_mode: service:iot_ts
     restart: unless-stopped
     labels:
       - falarie.groupby=iot
@@ -74,41 +85,11 @@ services:
     environment:
       - HA_URL=http://localhost:80
       - TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIzMzMyM2Y5NGMyMjg0MzlhYmZkZGNhYzNkOTJmYWEwMiIsImlhdCI6MTczNTY5OTkxNSwiZXhwIjoyMDUxMDU5OTE1fQ.IbQOoigaz9q2UvnSZvmOKUUpO71WycXhrRpZaywLzfQ
-      - DASH_URL=http://homeassistant.iot:5050
+      - DASH_URL=http://homeassistant.sole-altair.ts.net:5050
     volumes:
       - /data/containers/appdaemon:/conf
-    network_mode: service:homeassistant
-    restart: unless-stopped
-    labels:
-      - falarie.groupby=iot
-
-  ts_nodered:
-    image: tailscale/tailscale
-    container_name: ts_nodered
-    cap_add:
-      - net_admin
-      - sys_module
-    env_file: ../tskey.env
-    environment:
-      - TZ=America/Montreal
-      - TS_HOSTNAME=nodered
-      - TS_EXTRA_ARGS=--accept-dns=false
-      - TS_STATE_DIR=/var/lib/tailscale
-      - TS_USERSPACE=false
-      - TS_SERVE_CONFIG=/config/serve.json
-    volumes:
-      - nodered_ts:/var/lib/tailscale
-      - ./ts_nodered:/config
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    networks:
-      lagoon:
-        aliases:
-          - nr
-      johnny:
-        ipv4_address: 192.168.2.212
-    extra_hosts:
-      - "host:192.168.2.192"
+      - /dev/null:/certs
+    network_mode: service:iot_ts
     restart: unless-stopped
     labels:
       - falarie.groupby=iot
@@ -116,25 +97,25 @@ services:
   nodered:
     image: nodered/node-red
     container_name: nodered
-    depends_on: [ts_nodered]
-    user: 1000:100
+    user: "1000:100"
+    depends_on: [homeassistant, mosquitto]
     healthcheck:
-      test: curl -f http://127.0.0.1 || exit 1
+      start_period: 20s
+      test: curl -f http://nr:8080/health.html || exit 1
       interval: 5m
       retries: 3
     env_file:
       - ~/secrets/nodered.env
     environment:
-      - NODE_RED_HTTPADMINROOT=/admin
-      - NODE_RED_PORT=80
       - TZ=America/Montreal
+      # - NODE_RED_HTTPADMINROOT=/admin
+      # - NODE_RED_HTTPNODEROOT=/
+      - NODE_RED_PORT=8080
     volumes:
-      - /data/containers/nodered/config/settings.js:/data/settings.js
-      - /data/containers/nodered/data:/data
-      - /data/containers/nodered/projects:/data/projects
-      - nodered_ws:/workspace
+      - /data/containers/nodered:/data
+      - /data/workspace:/workspace
       - /d/ruby/audio/podcasts/:/podcasts
-    network_mode: service:ts_nodered
+    network_mode: service:iot_ts
     restart: unless-stopped
     labels:
       - falarie.groupby=iot
