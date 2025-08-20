@@ -71,6 +71,7 @@ services:
       - radarr_ts:/var/lib/tailscale
       - /data/containers/radarr:/config
       - /l/backup/raktar/radarr:/config/backup
+      - ./radarr:/scripts
       - /d/emerald:/emerald
     devices:
       - /dev/net/tun:/dev/net/tun
