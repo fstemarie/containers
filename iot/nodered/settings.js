@@ -1,1 +1,1 @@
-/data/containers/nodered/config/settings.js
+/data/containers/nodered/settings.js
