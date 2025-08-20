@@ -8,6 +8,7 @@ networks:
 
 volumes:
   jellyfin_ts:
+  jellyseerr_ts:
 
 services:
   jellyfin:
@@ -16,7 +17,7 @@ services:
     env_file: ../tskey.env
     environment:
       - PUID=984 # homemedia
-      - PGID=984 # homemedia
+      - PGID=100
       - TZ=America/Montreal
       - JELLYFIN_PublishedServerUrl=jellyfin.sole-altair.ts.net #optional
       - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
@@ -28,22 +29,95 @@ services:
     volumes:
       - jellyfin_ts:/var/lib/tailscale
       - /data/containers/jellyfin:/config
-      - /l/video/documentaries:/data/documentaries
-      - /l/video/miniseries:/data/miniseries
-      - /l/video/tvshows:/data/tvshows
-      - /l/video/tvshows-michelle:/data/tvshows-michelle
-      - /l/video/movies:/data/movies
-      - /l/video/movies-michelle:/data/movies-michelle
-      - /l/video/ufc:/data/ufc
-      - /l/audio/library:/data/audio
-      - /data/workspace/iptv:/data/iptv
+      - /l/video/documentaries:/data/documentaries:ro
+      - /l/video/miniseries:/data/miniseries:ro
+      - /l/video/tvshows:/data/tvshows:ro
+      - /l/video/tvshows-michelle:/data/tvshows-michelle:ro
+      - /l/video/movies:/data/movies:ro
+      - /l/video/movies-michelle:/data/movies-michelle:ro
+      - /l/video/ufc:/data/ufc:ro
+      - /l/audio/library:/data/audio:ro
+      - /l/audio/podcasts:/data/podcasts:ro
+      - /data/workspace/iptv:/data/iptv:ro
     networks:
       lagoon:
-        aliases: ["jlfn"]
-      johnny:
-        ipv4_address: 192.168.2.204
+        aliases: [jlfn]
     devices:
       - /dev/dri:/dev/dri
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=media
+  
+  jellysweep:
+    image: ghcr.io/jon4hz/jellysweep:latest
+    depends_on: [jellyfin]
+    container_name: jellysweep
+    user: "1000:100"
+    volumes:
+      - /data/containers/jellysweep:/app
+      # Mount Jellyfin library paths at the same locations for disk usage monitoring
+      # Example: if Jellyfin has /data/movies, mount it the same way here
+      - /l/video/documentaries:/data/documentaries:ro
+      - /l/video/miniseries:/data/miniseries:ro
+      - /l/video/tvshows:/data/tvshows:ro
+      - /l/video/tvshows-michelle:/data/tvshows-michelle:ro
+      - /l/video/movies:/data/movies:ro
+      - /l/video/movies-michelle:/data/movies-michelle:ro
+      - /l/video/ufc:/data/ufc:ro
+      - /l/audio/library:/data/audio:ro
+      - /l/audio/podcasts:/data/podcasts:ro
+    environment:
+      # Override config values via environment variables if needed
+      - JELLYSWEEP_DRY_RUN=true
+      - JELLYSWEEP_LISTEN=0.0.0.0:3002
+      - JELLYSWEEP_SESSION_KEY=BS2n4gdpc7JU84G7Etiim2KO81ECMyIdrbNUQpQTJPE=
+    restart: unless-stopped
+    network_mode: service:jellyfin
+    labels:
+      - falarie.groupby=media
+
+  jellyseerr_ts:
+    image: tailscale/tailscale
+    container_name: jellyseerr_ts
+    cap_add:
+      - net_admin
+      - sys_module
+    env_file: ../tskey.env
+    environment:
+      - TZ=America/Montreal
+      - TS_HOSTNAME=jellyseerr
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+      - TS_SERVE_CONFIG=/config/serve.json
+    volumes:
+      - jellyseerr_ts:/var/lib/tailscale
+      - ./jellyseer_ts:/config
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    networks:
+      lagoon:
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=media
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    depends_on: [jellyseerr_ts]
+    container_name: jellyseerr
+    user: "1000:100"
+    environment:
+      - LOG_LEVEL=info
+      - TZ=America/Montreal
+      - PORT=80 #optional
+    volumes:
+      - /data/containers/jellyseerr:/app/config
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost/api/v1/status || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
+    network_mode: service:jellyseerr_ts
     restart: unless-stopped
     labels:
       - falarie.groupby=media
