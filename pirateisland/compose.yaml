@@ -135,3 +135,16 @@ services:
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
+
+  byparr: # Port 8191
+    image: ghcr.io/thephaseless/byparr:latest
+    container_name: byparr
+    environment:
+      - TZ=America/Montreal
+    volumes:
+      - /dev/null:/app/screenshots # For screenshots when exception occurs
+    networks:
+      - lagoon
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=pirateisland
