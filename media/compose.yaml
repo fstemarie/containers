@@ -7,47 +7,9 @@ networks:
     external: true
 
 volumes:
-  airsonic_ts:
-  ombi_ts:
   jellyfin_ts:
 
 services:
-  navidrome:
-    image: deluan/navidrome:latest
-    container_name: navidrome
-    user: 984:100 # should be owner of volumes
-    environment:
-      - ND_PORT=80
-    networks:
-      lagoon:
-      johnny:
-        ipv4_address: 192.168.2.194
-    volumes:
-      - /data/containers/navidrome:/data
-      - /l/audio:/music:ro
-    restart: unless-stopped
-    labels:
-      - falarie.groupby=media
-
-  plex:
-    image: lscr.io/linuxserver/plex:latest
-    container_name: plex
-    environment:
-      - PUID=984 # homemedia
-      - PGID=984 # homemedia
-      - TZ=America/Montreal
-      - VERSION=docker
-    volumes:
-      - /data/containers/plex:/config
-      - /l/video:/media
-      - /l/audio/library:/media/audio
-    network_mode: host
-    devices:
-      - /dev/dri:/dev/dri
-    restart: unless-stopped
-    labels:
-      - falarie.groupby=media
-
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
