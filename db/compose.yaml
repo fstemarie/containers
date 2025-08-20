@@ -7,6 +7,9 @@ networks:
   lagoon:
     external: true
 
+volumes:
+  mariadb_ts:
+
 services:
   mariadb:
     image: lscr.io/linuxserver/mariadb
@@ -17,18 +20,23 @@ services:
       - PUID=990
       - PGID=990
       - TZ=America/Montreal
+      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
+      - TAILSCALE_STATE_DIR=/var/lib/tailscale
+      - TAILSCALE_SERVE_MODE=https
+      - TAILSCALE_SERVE_PORT=80
+      - TAILSCALE_HOSTNAME=mariadb
       # - MYSQL_ROOT_PASSWORD=
       # - MYSQL_DATABASE=USER_DB_NAME #optional
       # - MYSQL_USER=MYSQL_USER #optional
       # - MYSQL_PASSWORD=DATABASE_PASSWORD #optional
       # - REMOTE_SQL=http://URL1/your.sql,https://URL2/your.sql #optional
     volumes:
+      - mariadb_ts:/var/lib/tailscale
       - /data/containers/mariadb:/config
       - /l/backup/raktar/mariadb:/backup
     networks:
       lagoon:
-        aliases:
-          - "db"
+        aliases: ["db"]
       johnny:
         ipv4_address: 192.168.2.193
     ports:
