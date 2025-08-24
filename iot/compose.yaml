@@ -32,7 +32,7 @@ services:
       - /dev/net/tun:/dev/net/tun
     networks:
       lagoon:
-        aliases: [iot, ad, nr, ha]
+        aliases: [iot, ad, nr, ha, msqt]
       johnny:
         ipv4_address: 192.168.2.201
     extra_hosts:
