@@ -45,8 +45,9 @@ services:
 
   mosquitto:
     image: docker.io/eclipse-mosquitto
-    depends_on: [iot_ts]
     container_name: mosquitto
+    depends_on: [iot_ts]
+    user: "986:986"
     volumes:
       - mosquitto:/mosquitto/data
       - /data/containers/mosquitto/config:/mosquitto/config
@@ -83,9 +84,11 @@ services:
     depends_on: [homeassistant, mosquitto]
     user: 986:986
     environment:
+      - TZ=America/Montreal
       - HA_URL=http://localhost:80
       - TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIzMzMyM2Y5NGMyMjg0MzlhYmZkZGNhYzNkOTJmYWEwMiIsImlhdCI6MTczNTY5OTkxNSwiZXhwIjoyMDUxMDU5OTE1fQ.IbQOoigaz9q2UvnSZvmOKUUpO71WycXhrRpZaywLzfQ
       - DASH_URL=http://homeassistant.sole-altair.ts.net:5050
+      - HOME=/conf
     volumes:
       - /data/containers/appdaemon:/conf
       - /dev/null:/certs
