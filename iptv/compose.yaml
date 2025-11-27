@@ -1,0 +1,58 @@
+---
+
+networks:
+  johnny:
+    external: true
+  lagoon:
+    external: true
+
+volumes:
+  plutotv:
+
+services:
+
+  nextpvr:
+    image: docker.io/nextpvr/nextpvr_amd64:latest
+    container_name: nextpvr
+    hostname: nextpvr
+    volumes:
+      - /data/containers/nextpvr/config:/config
+      - /data/containers/nextpvr/recordings:/recordings
+      - /data/containers/nextpvr/buffer:/buffer
+      - plutotv:/iptv/plutotv
+    networks:
+      lagoon:
+      johnny:
+        ipv4_address: 192.168.2.213
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=iptv
+
+  samsungtv:
+    image: matthuisman/samsung-tvplus-for-channels
+    container_name: samsungtv
+    hostname: samsungtv
+    environment:
+      - REGION=us
+    networks:
+      lagoon:
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=iptv
+
+  plutotv:
+    image: plutotv
+    container_name: plutotv
+    user: 1000:100
+    build:
+      dockerfile_inline: |
+        FROM node:latest
+        RUN npm install -g pluto-iptv
+        USER 1000:100
+        VOLUME /data
+        WORKDIR /data
+        CMD npx pluto-iptv
+    volumes:
+        - plutotv:/data
+    labels:
+      - falarie.groupby=iptv
