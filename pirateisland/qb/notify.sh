@@ -4,7 +4,7 @@
 # /config/notify.sh -e "finished" -k "%K" -n "%N" -l "%L" -g "%G" -f "%F" -r "%R" -c "%C" -z "%Z" -t "%T" -i "%I" -j "%J"
 
 QB_URL="http://localhost"
-WH_URL="http://nr/wh/qb"
+WH_URL="http://nr:8080/wh/qb"
 
 echo "
 ### $(date --iso-8601=seconds) ###
