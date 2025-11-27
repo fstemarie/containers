@@ -15,9 +15,11 @@ services:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
     env_file: ../tskey.env
+    group_add: 
+      - "105" # render
     environment:
       - PUID=984 # homemedia
-      - PGID=100
+      - PGID=100 # users
       - TZ=America/Montreal
       - JELLYFIN_PublishedServerUrl=jellyfin.sole-altair.ts.net #optional
       - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
@@ -26,9 +28,12 @@ services:
       - TAILSCALE_SERVE_PORT=80
       - TAILSCALE_HOSTNAME=jellyfin
       - TAILSCALE_FUNNEL=on
+    devices:
+      - /dev/dri:/dev/dri
     volumes:
       - jellyfin_ts:/var/lib/tailscale
       - /data/containers/jellyfin:/config
+      - /data/workspace/iptv:/data/iptv:ro
       - /l/video/documentaries:/data/documentaries:ro
       - /l/video/miniseries:/data/miniseries:ro
       - /l/video/tvshows:/data/tvshows:ro
@@ -36,49 +41,61 @@ services:
       - /l/video/movies:/data/movies:ro
       - /l/video/movies-michelle:/data/movies-michelle:ro
       - /l/video/ufc:/data/ufc:ro
-      - /l/audio/library:/data/audio:ro
+      - /l/audio/files:/data/audio:ro
       - /l/audio/podcasts:/data/podcasts:ro
-      - /data/workspace/iptv:/data/iptv:ro
     networks:
       lagoon:
         aliases: [jlfn]
-    devices:
-      - /dev/dri:/dev/dri
+      johnny:
+        ipv4_address: 192.168.2.215
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=media
+
+  jellystat: # Port 3000
+    image: 'cyfershepard/jellystat:latest'
+    container_name: jellystat
+    depends_on: [jellyfin, jellyseerr]
+    env_file: ~/.secrets/jellystat.env
+    environment:
+      - TZ=America/Montreal
+      - POSTGRES_USER=postgres
+      - POSTGRES_IP=db
+      - POSTGRES_PORT=5432
+      - JWT_SECRET=b848180e13d7f85d6e17965d7c9ee95377bb27a54a086a6c51a8151530823918
+    volumes:
+      - /l/backup/raktar/jellystat:/app/backend/backup-data
+    network_mode: service:jellyfin
     restart: unless-stopped
     labels:
       - falarie.groupby=media
   
-  jellysweep:
+  jellysweep: # Port 3002
     image: ghcr.io/jon4hz/jellysweep:latest
-    depends_on: [jellyfin]
     container_name: jellysweep
-    user: "1000:100"
-    volumes:
-      - /data/containers/jellysweep:/app
-      # Mount Jellyfin library paths at the same locations for disk usage monitoring
-      # Example: if Jellyfin has /data/movies, mount it the same way here
-      - /l/video/documentaries:/data/documentaries:ro
-      - /l/video/miniseries:/data/miniseries:ro
-      - /l/video/tvshows:/data/tvshows:ro
-      - /l/video/tvshows-michelle:/data/tvshows-michelle:ro
-      - /l/video/movies:/data/movies:ro
-      - /l/video/movies-michelle:/data/movies-michelle:ro
-      - /l/video/ufc:/data/ufc:ro
-      - /l/audio/library:/data/audio:ro
-      - /l/audio/podcasts:/data/podcasts:ro
+    depends_on: [jellyfin, jellyseerr, jellystat]
+    # user: "984:100"
     environment:
       # Override config values via environment variables if needed
       - JELLYSWEEP_DRY_RUN=true
       - JELLYSWEEP_LISTEN=0.0.0.0:3002
       - JELLYSWEEP_SESSION_KEY=BS2n4gdpc7JU84G7Etiim2KO81ECMyIdrbNUQpQTJPE=
-    restart: unless-stopped
+    volumes:
+      - /data/containers/jellysweep/config.yml:/app/config.yml
+      - /data/containers/jellysweep/data:/app/data
+      # Mount Jellyfin library paths at the same locations for disk usage monitoring
+      # Example: if Jellyfin has /data/movies, mount it the same way here
+      - /l/video/tvshows-michelle:/data/tvshows-michelle:ro
+      - /l/video/movies-michelle:/data/movies-michelle:ro
     network_mode: service:jellyfin
+    restart: unless-stopped
     labels:
       - falarie.groupby=media
 
   jellyseerr_ts:
     image: tailscale/tailscale
     container_name: jellyseerr_ts
+    depends_on: [jellyfin]
     cap_add:
       - net_admin
       - sys_module
@@ -96,6 +113,7 @@ services:
       - /dev/net/tun:/dev/net/tun
     networks:
       lagoon:
+        aliases: [jlsr]
     restart: unless-stopped
     labels:
       - falarie.groupby=media
