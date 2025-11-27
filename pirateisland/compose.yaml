@@ -62,11 +62,12 @@ services:
       - PGID=100
       - TZ=America/Montreal
       - UMASK=022 #optional
-      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
+      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main|linuxserver/mods:radarr-striptracks
       - TAILSCALE_STATE_DIR=/var/lib/tailscale
       - TAILSCALE_SERVE_MODE=https
       - TAILSCALE_SERVE_PORT=80
       - TAILSCALE_HOSTNAME=radarr
+      - STRIPTRACKS_ARGS=--audio :eng --subs :eng
     volumes:
       - radarr_ts:/var/lib/tailscale
       - /data/containers/radarr:/config
@@ -94,11 +95,12 @@ services:
       - PGID=100
       - TZ=America/Montreal
       - UMASK=022 #optional
-      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
+      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main|linuxserver/mods:radarr-striptracks
       - TAILSCALE_STATE_DIR=/var/lib/tailscale
       - TAILSCALE_SERVE_MODE=https
       - TAILSCALE_SERVE_PORT=80
       - TAILSCALE_HOSTNAME=sonarr
+      - STRIPTRACKS_ARGS=--audio :eng --subs :eng
       # - TAILSCALE_AUTHKEY=${TSKEY}
     volumes:
       - sonarr_ts:/var/lib/tailscale
