@@ -1,0 +1,27 @@
+---
+
+networks:
+  lagoon:
+    external: true
+  johnny:
+    external: true
+
+services:
+  slskd:
+    image: slskd/slskd
+    container_name: slskd
+    user: 1000:100
+    env_file: [~/.secrets/slskd.env]
+    environment:
+      - "SLSKD_REMOTE_CONFIGURATION=true"
+      - "SLSKD_REMOTE_FILE_MANAGEMENT=true"
+    volumes:
+      - "/data/containers/slskd:/app"
+      - "/l/audio/downloads:/downloads"
+      - "/l/audio/files:/l/audio/files"
+      - "/l/audio/library:/l/audio/library"
+    networks:
+      lagoon:
+      johnny:
+        ipv4_address: 192.168.2.214
+    restart: unless-stopped
