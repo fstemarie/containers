@@ -1,0 +1,16 @@
+{
+    "TCP": {
+      "443": {
+        "HTTPS": true
+      }
+    },
+    "Web": {
+      "db.sole-altair.ts.net:443": {
+        "Handlers": {
+          "/": {
+            "Proxy": "http://localhost:80"
+          }
+        }
+      }
+    }
+  }
