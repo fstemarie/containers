@@ -1,11 +1,8 @@
 ---
 
 networks:
-  # https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/
-  # docker network create -d macvlan -o parent=enp1s0 -o macvlan_mode=bridge --subnet=192.168.0.0/16 --gateway=192.168.0.1 --ip-range=192.168.2.192/26 --aux-address='host=192.168.2.192' johnny
-  johnny: 
+  ocean: 
     external: true
-  # docker network create --subnet=172.16.0.0/24 lagoon
   lagoon:
     external: true
 
@@ -35,18 +32,18 @@ services:
       - TAILSCALE_HOSTNAME=qb
     volumes:
       - qbittorrent_ts:/var/lib/tailscale
-      - /data/containers/qbittorrent:/config
-      - ./qb/notify.sh:/config/notify.sh:ro
+      - /srv/qbittorrent:/config
+      - ./qb/notify.sh:/config/notify.sh
       - /d/ruby:/ruby
+      - /d/ruby/torrents:/torrents
       - /d/ruby/downloads:/downloads
       - /d/emerald:/emerald
-      - /d/jade/files/torrents:/torrents
     devices:
       - /dev/net/tun:/dev/net/tun
     networks:
       lagoon:
         aliases: ["qb"]
-      johnny:
+      ocean:
         ipv4_address: 192.168.2.210
     restart: unless-stopped
     labels:
@@ -67,11 +64,11 @@ services:
       - TAILSCALE_SERVE_MODE=https
       - TAILSCALE_SERVE_PORT=80
       - TAILSCALE_HOSTNAME=radarr
-      - STRIPTRACKS_ARGS=--audio :eng --subs :eng
+      - STRIPTRACKS_ARGS=--audio :eng:fre --subs :eng:fre
     volumes:
       - radarr_ts:/var/lib/tailscale
-      - /data/containers/radarr:/config
-      - /l/backup/raktar/radarr:/config/backup
+      - /srv/radarr:/config
+      - /l/backup/sklad/radarr:/config/Backups
       - ./radarr:/scripts
       - /d/emerald:/emerald
     devices:
@@ -79,7 +76,7 @@ services:
     networks:
       lagoon:
         aliases: ["rdr"]
-      johnny:
+      ocean:
         ipv4_address: 192.168.2.211
     restart: unless-stopped
     labels:
@@ -100,19 +97,19 @@ services:
       - TAILSCALE_SERVE_MODE=https
       - TAILSCALE_SERVE_PORT=80
       - TAILSCALE_HOSTNAME=sonarr
-      - STRIPTRACKS_ARGS=--audio :eng --subs :eng
+      - STRIPTRACKS_ARGS=--audio :eng:fre --subs :eng:fre
       # - TAILSCALE_AUTHKEY=${TSKEY}
     volumes:
       - sonarr_ts:/var/lib/tailscale
-      - /data/containers/sonarr:/config
-      - /l/backup/raktar/sonarr:/config/Backups
+      - /srv/sonarr:/config
+      - /l/backup/sklad/sonarr:/config/Backups
       - /d/emerald:/emerald
     devices:
       - /dev/net/tun:/dev/net/tun
     networks:
       lagoon:
         aliases: ["snr"]
-      johnny:
+      ocean:
         ipv4_address: 192.168.2.212
     restart: unless-stopped
     labels:
@@ -127,12 +124,11 @@ services:
       - TZ=America/Montreal
       - AUTO_UPDATE=false
     volumes:
-      - /data/containers/jackett:/config
-      - /d/jade/files/torrents:/torrents
+      - /srv/jackett:/config
     networks:
       lagoon:
         aliases: ["jkt"]
-      johnny:
+      ocean:
         ipv4_address: 192.168.2.213
     restart: unless-stopped
     labels:

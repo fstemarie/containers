@@ -1,7 +1,7 @@
 ---
 
 networks:
-  johnny:
+  ocean:
     external: true
   lagoon:
     external: true
@@ -9,7 +9,7 @@ networks:
 volumes:
   ts:
   pgdata:
-  mariadb:
+  # mariadb:
 
 services:
   db_ts:
@@ -33,12 +33,13 @@ services:
     networks:
       lagoon:
         aliases: ["db"]
-      johnny:
+      ocean:
         ipv4_address: 192.168.2.200
     extra_hosts:
       - "host:192.168.2.192" # Raktar's IP
       - "raktar:192.168.1.1" # Raktar's IP
       - "filebox:192.168.1.2" # Filebox's IP
+      - "sklad:192.168.1.4" # Raktar's IP
     restart: unless-stopped
     labels:
       - falarie.groupby=db
@@ -68,8 +69,8 @@ services:
     env_file:
       - ~/.secrets/postgres.env
     volumes:
-      - /data/containers/postgres/config:/config
-      - /data/containers/postgres/data:/var/lib/postgresql/data
+      - /srv/postgres/config:/config
+      - /srv/postgres/data:/var/lib/postgresql/data
       - /l/backup/raktar/postgres:/backup
     network_mode: service:db_ts
     # ports:
