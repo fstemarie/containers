@@ -1,14 +1,14 @@
 ---
 
 networks:
-  johnny:
+  ocean:
     external: true
   lagoon:
     external: true
 
 volumes:
   jellyfin_ts:
-  jellyseerr_ts:
+  seerr_ts:
 
 services:
   jellyfin:
@@ -22,79 +22,56 @@ services:
       - PGID=100 # users
       - TZ=America/Montreal
       - JELLYFIN_PublishedServerUrl=jellyfin.sole-altair.ts.net #optional
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
       - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
       - TAILSCALE_STATE_DIR=/var/lib/tailscale
-      - TAILSCALE_SERVE_MODE=https
+      - TAILSCALE_SERVE_MODE=http
       - TAILSCALE_SERVE_PORT=80
       - TAILSCALE_HOSTNAME=jellyfin
-      - TAILSCALE_FUNNEL=on
-    devices:
-      - /dev/dri:/dev/dri
     volumes:
       - jellyfin_ts:/var/lib/tailscale
-      - /data/containers/jellyfin:/config
-      - /data/workspace/iptv:/data/iptv:ro
+      - /srv/jellyfin:/config
+      - /l/backup/sklad/jellyfin:/config/data/data/backups
       - /l/video/documentaries:/data/documentaries:ro
       - /l/video/miniseries:/data/miniseries:ro
       - /l/video/tvshows:/data/tvshows:ro
       - /l/video/tvshows-michelle:/data/tvshows-michelle:ro
       - /l/video/movies:/data/movies:ro
       - /l/video/movies-michelle:/data/movies-michelle:ro
-      - /l/video/ufc:/data/ufc:ro
+      - /l/video/mma:/data/mma:ro
       - /l/audio/files:/data/audio:ro
       - /l/audio/podcasts:/data/podcasts:ro
     networks:
       lagoon:
         aliases: [jlfn]
-      johnny:
+      ocean:
         ipv4_address: 192.168.2.215
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    devices:
+      - /dev/dri:/dev/dri
+      - /dev/nvidia0:/dev/nvidia0
+      - /dev/nvidiactl:/dev/nvidiactl
+      - /dev/nvidia-uvm:/dev/nvidia-uvm
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+      - net.ipv6.conf.default.disable_ipv6=1
+    deploy:   # this section is for NVIDIA support in newer docker-compose
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     restart: unless-stopped
     labels:
       - falarie.groupby=media
 
-  jellystat: # Port 3000
-    image: 'cyfershepard/jellystat:latest'
-    container_name: jellystat
-    depends_on: [jellyfin, jellyseerr]
-    env_file: ~/.secrets/jellystat.env
-    environment:
-      - TZ=America/Montreal
-      - POSTGRES_USER=postgres
-      - POSTGRES_IP=db
-      - POSTGRES_PORT=5432
-      - JWT_SECRET=b848180e13d7f85d6e17965d7c9ee95377bb27a54a086a6c51a8151530823918
-    volumes:
-      - /l/backup/raktar/jellystat:/app/backend/backup-data
-    network_mode: service:jellyfin
-    restart: unless-stopped
-    labels:
-      - falarie.groupby=media
-  
-  jellysweep: # Port 3002
-    image: ghcr.io/jon4hz/jellysweep:latest
-    container_name: jellysweep
-    depends_on: [jellyfin, jellyseerr, jellystat]
-    # user: "984:100"
-    environment:
-      # Override config values via environment variables if needed
-      - JELLYSWEEP_DRY_RUN=true
-      - JELLYSWEEP_LISTEN=0.0.0.0:3002
-      - JELLYSWEEP_SESSION_KEY=BS2n4gdpc7JU84G7Etiim2KO81ECMyIdrbNUQpQTJPE=
-    volumes:
-      - /data/containers/jellysweep/config.yml:/app/config.yml
-      - /data/containers/jellysweep/data:/app/data
-      # Mount Jellyfin library paths at the same locations for disk usage monitoring
-      # Example: if Jellyfin has /data/movies, mount it the same way here
-      - /l/video/tvshows-michelle:/data/tvshows-michelle:ro
-      - /l/video/movies-michelle:/data/movies-michelle:ro
-    network_mode: service:jellyfin
-    restart: unless-stopped
-    labels:
-      - falarie.groupby=media
-
-  jellyseerr_ts:
+  seerr_ts:
     image: tailscale/tailscale
-    container_name: jellyseerr_ts
+    container_name: seerr_ts
     depends_on: [jellyfin]
     cap_add:
       - net_admin
@@ -102,40 +79,41 @@ services:
     env_file: ../tskey.env
     environment:
       - TZ=America/Montreal
-      - TS_HOSTNAME=jellyseerr
+      - TS_HOSTNAME=seerr
       - TS_STATE_DIR=/var/lib/tailscale
       - TS_USERSPACE=false
       - TS_SERVE_CONFIG=/config/serve.json
     volumes:
-      - jellyseerr_ts:/var/lib/tailscale
-      - ./jellyseer_ts:/config
+      - seerr_ts:/var/lib/tailscale
+      - ./seer_ts:/config
     devices:
       - /dev/net/tun:/dev/net/tun
     networks:
       lagoon:
-        aliases: [jlsr]
+        aliases: [sr]
     restart: unless-stopped
     labels:
       - falarie.groupby=media
 
-  jellyseerr:
-    image: fallenbagel/jellyseerr:latest
-    depends_on: [jellyseerr_ts]
-    container_name: jellyseerr
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
+    depends_on: [seerr_ts]
+    container_name: seerr
     user: "1000:100"
     environment:
       - LOG_LEVEL=info
       - TZ=America/Montreal
       - PORT=80 #optional
     volumes:
-      - /data/containers/jellyseerr:/app/config
+      - /srv/seerr:/app/config
     healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost/api/v1/status || exit 1
+      test: wget --no-verbose --tries=1 --spider http://localhost/api/v1/settings/public || exit 1
       start_period: 20s
       timeout: 3s
       interval: 15s
       retries: 3
-    network_mode: service:jellyseerr_ts
+    network_mode: service:seerr_ts
     restart: unless-stopped
     labels:
       - falarie.groupby=media
