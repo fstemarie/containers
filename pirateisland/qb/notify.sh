@@ -26,8 +26,7 @@ while getopts "e:k:n:l:g:f:r:c:z:t:i:j:-" opt; do
 done
 
 # Split la string en array
-tags=$(echo $tags | tr "," " ")
-tags=($tags)
+tags=($(echo $tags | tr "," " "))
 
 # Si le torrent a la categorie speciale pour les torrent de Michelle...
 if [ "${category[@]: -2}" = "_m" ]; then
