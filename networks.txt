@@ -1,0 +1,16 @@
+https://blog.oddbit.com/post/2018-03-12-using-docker-macvlan-networks/
+
+docker network create -d macvlan -o parent=enp0s31f6 -o macvlan_mode=bridge --subnet=192.168.0.0/16 --gateway=192.168.0.1 --ip-range=192.168.2.192/26 --aux-address='host=192.168.2.192' ocean
+docker network create --subnet=172.16.0.0/24 lagoon
+
+
+to ping containers from the host
+
+>> /etc/rc.local
+#!/bin/sh -e
+
+ip link add ocean-shim link enp0s31f6 type macvlan mode bridge
+ip addr add 192.168.2.192/32 dev ocean-shim
+ip link set ocean-shim up
+ip route add 192.168.2.192/26 dev ocean-shim
+<<
