@@ -3,3 +3,4 @@ screenshots
 iot/mosquitto/passwd
 iot/appdaemon/secrets.yaml
 headscale/config.yaml
+traefik/traefik/traefik.yml
