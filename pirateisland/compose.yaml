@@ -43,6 +43,7 @@ services:
       lagoon:
         aliases: ["qb"]
       ocean:
+        ipv4_address: 10.0.2.210
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/api/v2/app/version"]
       interval: 30s
@@ -81,7 +82,7 @@ services:
       lagoon:
         aliases: ["rdr"]
       ocean:
-        ipv4_address: 192.168.2.211
+        ipv4_address: 10.0.2.211
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
@@ -114,7 +115,7 @@ services:
       lagoon:
         aliases: ["snr"]
       ocean:
-        ipv4_address: 192.168.2.212
+        ipv4_address: 10.0.2.212
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
