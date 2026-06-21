@@ -35,10 +35,10 @@ services:
       lagoon:
         aliases: [iot, ad, nr, ha, msqt]
       ocean:
-        ipv4_address: 192.168.2.201
+        ipv4_address: 10.0.2.201
     extra_hosts:
-      - "host:192.168.2.192" # Raktar's IP
-      - "filebox:192.168.1.2" # Filebox's IP
+      - "host:10.0.2.192" # Raktar's IP
+      - "filebox:10.0.1.2" # Filebox's IP
     restart: unless-stopped
     labels:
       - falarie.groupby=iot
