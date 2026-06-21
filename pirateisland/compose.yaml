@@ -10,8 +10,7 @@ volumes:
   qbittorrent_ts:
   radarr_ts:
   sonarr_ts:
-  ombi_ts:
-  prowlarr_ts:
+  jackett_ts:
 
 services:
   qbittorrent:
@@ -118,18 +117,28 @@ services:
   jackett:
     image: lscr.io/linuxserver/jackett
     container_name: jackett
+    privileged: true
+    env_file: ../tskey.env
     environment:
       - PUID=1000
       - PGID=100
       - TZ=America/Montreal
       - AUTO_UPDATE=false
+      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
+      - TAILSCALE_STATE_DIR=/var/lib/tailscale
+      - TAILSCALE_SERVE_MODE=https
+      - TAILSCALE_SERVE_PORT=80
+      - TAILSCALE_HOSTNAME=jackett
     volumes:
       - /srv/jackett:/config
+      - jackett_ts:/var/lib/tailscale
+    devices:
+      - /dev/net/tun:/dev/net/tun
     networks:
       lagoon:
         aliases: ["jkt"]
       ocean:
-        ipv4_address: 192.168.2.213
+        ipv4_address: 10.0.2.213
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
