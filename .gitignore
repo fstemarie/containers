@@ -2,3 +2,4 @@ tskey.env
 screenshots
 iot/mosquitto/passwd
 iot/appdaemon/secrets.yaml
+headscale/config.yaml
