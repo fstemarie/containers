@@ -1,55 +1,40 @@
 ---
 
 networks:
-  ocean: 
-    external: true
   lagoon:
     external: true
-
-volumes:
-  qbittorrent_ts:
-  radarr_ts:
-  sonarr_ts:
-  jackett_ts:
+  greygoose:
+    external: true
 
 services:
-  qbittorrent:
+  qb:
     image: lscr.io/linuxserver/qbittorrent
-    container_name: qbittorrent
+    container_name: qb
     privileged: true
-    env_file: ../tskey.env
     environment:
-      - PUID=984
-      - PGID=100
+      - PUID=897
+      - PGID=899
       - TZ=America/Montreal
       - UMASK=022
       - WEBUI_PORT=80
-      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main|ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
-      - TAILSCALE_STATE_DIR=/var/lib/tailscale
-      - TAILSCALE_SERVE_MODE=https
-      - TAILSCALE_SERVE_PORT=80
-      - TAILSCALE_HOSTNAME=qb
+      - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
     volumes:
-      - qbittorrent_ts:/var/lib/tailscale
-      - /srv/qbittorrent:/config
+      - /l/containers/qbittorrent:/config
       - ./qb/notify.sh:/config/notify.sh
       - /d/ruby:/ruby
       - /d/ruby/torrents:/torrents
       - /d/ruby/downloads:/downloads
       - /d/emerald:/emerald
-    devices:
-      - /dev/net/tun:/dev/net/tun
     networks:
       lagoon:
-        aliases: ["qb"]
-      ocean:
-        ipv4_address: 10.0.2.210
+      greygoose:
+        ipv4_address: 192.168.0.2
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/api/v2/app/version"]
+      test: curl --fail http://127.0.0.1/api/v2/app/version
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 20s
+      start_period: 10s
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
@@ -58,31 +43,29 @@ services:
     image: lscr.io/linuxserver/radarr
     container_name: radarr
     privileged: true
-    env_file: ../tskey.env
+    env_file: apikeys.env
     environment:
-      - PUID=984
-      - PGID=100
+      - PUID=896
+      - PGID=899
       - TZ=America/Montreal
       - UMASK=022 #optional
-      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main|linuxserver/mods:radarr-striptracks
-      - TAILSCALE_STATE_DIR=/var/lib/tailscale
-      - TAILSCALE_SERVE_MODE=https
-      - TAILSCALE_SERVE_PORT=80
-      - TAILSCALE_HOSTNAME=radarr
+      - DOCKER_MODS=linuxserver/mods:radarr-striptracks
       - STRIPTRACKS_ARGS=--audio :eng:fre --subs :eng:fre
     volumes:
-      - radarr_ts:/var/lib/tailscale
-      - /srv/radarr:/config
+      - /l/containers/radarr:/config
       - /l/backup/sklad/radarr:/config/Backups
       - ./radarr:/scripts
       - /d/emerald:/emerald
-    devices:
-      - /dev/net/tun:/dev/net/tun
     networks:
       lagoon:
-        aliases: ["rdr"]
-      ocean:
-        ipv4_address: 10.0.2.211
+      greygoose:
+        ipv4_address: 192.168.0.3
+    healthcheck:
+      test: curl --fail http://127.0.0.1/api/v3/health?apikey=$$RADARR_APIKEY
+      interval: 30s
+      timeout: 10s
+      retries: 1
+      start_period: 10s
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
@@ -91,31 +74,28 @@ services:
     image: lscr.io/linuxserver/sonarr
     container_name: sonarr
     privileged: true
-    env_file: ../tskey.env
+    env_file: apikeys.env
     environment:
-      - PUID=984
-      - PGID=100
+      - PUID=895
+      - PGID=899
       - TZ=America/Montreal
       - UMASK=022 #optional
-      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main|linuxserver/mods:radarr-striptracks
-      - TAILSCALE_STATE_DIR=/var/lib/tailscale
-      - TAILSCALE_SERVE_MODE=https
-      - TAILSCALE_SERVE_PORT=80
-      - TAILSCALE_HOSTNAME=sonarr
+      - DOCKER_MODS=linuxserver/mods:radarr-striptracks
       - STRIPTRACKS_ARGS=--audio :eng:fre --subs :eng:fre
-      # - TAILSCALE_AUTHKEY=${TSKEY}
     volumes:
-      - sonarr_ts:/var/lib/tailscale
-      - /srv/sonarr:/config
+      - /l/containers/sonarr:/config
       - /l/backup/sklad/sonarr:/config/Backups
       - /d/emerald:/emerald
-    devices:
-      - /dev/net/tun:/dev/net/tun
     networks:
       lagoon:
-        aliases: ["snr"]
-      ocean:
-        ipv4_address: 10.0.2.212
+      greygoose:
+        ipv4_address: 192.168.0.4
+    healthcheck:
+      test: curl --fail http://127.0.0.1/api/v3/health?apikey=$$SONARR_APIKEY
+      interval: 30s
+      timeout: 10s
+      retries: 1
+      start_period: 10s
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
@@ -123,28 +103,24 @@ services:
   jackett:
     image: lscr.io/linuxserver/jackett
     container_name: jackett
-    privileged: true
-    env_file: ../tskey.env
     environment:
-      - PUID=1000
-      - PGID=100
+      - PUI=894
+      - PGID=894
       - TZ=America/Montreal
-      - AUTO_UPDATE=false
-      - DOCKER_MODS=ghcr.io/tailscale-dev/docker-mod:main
-      - TAILSCALE_STATE_DIR=/var/lib/tailscale
-      - TAILSCALE_SERVE_MODE=https
-      - TAILSCALE_SERVE_PORT=80
-      - TAILSCALE_HOSTNAME=jackett
+      - AUTO_UPDATE=true
     volumes:
-      - /srv/jackett:/config
-      - jackett_ts:/var/lib/tailscale
-    devices:
-      - /dev/net/tun:/dev/net/tun
+      - /l/containers/jackett:/config
+      - /d/ruby/torrents:/torrents
     networks:
       lagoon:
-        aliases: ["jkt"]
-      ocean:
-        ipv4_address: 10.0.2.213
+      greygoose:
+        ipv4_address: 192.168.0.5
+    healthcheck:
+      test: curl --fail http://127.0.0.1/UI/Dashboard
+      interval: 30s
+      timeout: 10s
+      retries: 1
+      start_period: 10s
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
@@ -157,7 +133,38 @@ services:
     volumes:
       - /dev/null:/app/screenshots # For screenshots when exception occurs
     networks:
-      - lagoon
+      lagoon:
+    healthcheck:
+      test: curl --fail http://127.0.0.1:8191/health
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 10s
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=pirateisland
+
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
+    container_name: seerr
+    user: "1000:100"
+    environment:
+      - LOG_LEVEL=info
+      - TZ=America/Montreal
+      - PORT=80 #optional
+    volumes:
+      - /l/containers/seerr:/app/config
+    networks:
+      lagoon:
+      greygoose:
+        ipv4_address: 192.168.0.6
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost/api/v1/settings/public || exit 1
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 10s
     restart: unless-stopped
     labels:
       - falarie.groupby=pirateisland
