@@ -1,0 +1,38 @@
+---
+
+networks:
+  lagoon:
+    external: true
+
+services:
+  headscale:
+    image: headscale/headscale:latest
+    container_name: headscale
+    volumes:
+      - /l/containers/headscale/config.yaml:/etc/headscale/config.yaml
+      - /l/containers/headscale/lib:/var/lib/headscale
+    command: serve
+    networks:
+      lagoon:
+    ports:
+      - "3478:3478/udp" # Catches high-speed, direct connection traffic (Primary)
+    #   - "80:80/tcp"
+    #   - "8080:8080/tcp"
+    #   - "8080:8080/udp"
+    #   - "50443:50443/tcp"
+    #   - "9090:9090/tcp"
+    extra_hosts:
+      - "auth.falarie.duckdns.org:host-gateway"
+    restart: unless-stopped
+    labels:
+      falarie.groupby: headscale
+
+  headscale-admin:
+    image: goodieshq/headscale-admin:dev
+    container_name: headscale-admin
+    depends_on: ["headscale"]
+    networks:
+      lagoon:
+    restart: unless-stopped
+    labels:
+      falarie.groupby: headscale

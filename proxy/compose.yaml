@@ -1,0 +1,61 @@
+---
+
+x-filebox-hosts: &filebox-hosts
+  homeassistant: 192.168.0.129
+  qbp: 192.168.0.130
+  radarrp: 192.168.0.131
+  sonarrp: 192.168.0.132
+  lidarr: 192.168.0.133
+  prowlarr: 192.168.0.134
+  byparrp: 192.168.0.135
+  tautulli: 192.168.0.136
+  seerrp: 192.168.0.137
+  fileflows: 192.168.0.138
+
+networks:
+  lagoon:
+    external: true
+  greygoose:
+    external: true
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+services:
+  caddy:
+    image: serfriz/caddy-duckdns:latest
+    container_name: caddy
+    entrypoint: caddy run --config /etc/caddy/Caddyfile --adapter caddyfile --watch
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - /l/containers/caddy/config:/etc/caddy
+      - /l/containers/caddy/log:/var/log/caddy
+      - caddy_config:/config
+      - caddy_data:/data
+    networks:
+      lagoon:
+      greygoose:
+        ipv4_address: 192.168.0.1
+    extra_hosts:
+      <<: *filebox-hosts
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=proxy
+
+  authelia:
+    image: authelia/authelia:latest
+    container_name: authelia
+    environment:
+      - TZ=America/Montreal
+    volumes:
+      - /l/containers/authelia:/config
+    networks:
+      lagoon:
+    restart: 'unless-stopped'
+    labels:
+      - falarie.groupby=proxy
