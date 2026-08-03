@@ -3,7 +3,9 @@
 # /config/notify.sh -e "added" -k "%K" -n "%N" -l "%L" -g "%G" -f "%F" -r "%R" -c "%C" -z "%Z" -t "%T" -i "%I" -j "%J"
 # /config/notify.sh -e "finished" -k "%K" -n "%N" -l "%L" -g "%G" -f "%F" -r "%R" -c "%C" -z "%Z" -t "%T" -i "%I" -j "%J"
 
-QB_URL="http://localhost"
+QB_URL="http://127.0.0.1"
+QB_setCategory="$QB_URL/api/v2/torrents/setCategory"
+QB_addTags="$QB_URL/api/v2/torrents/addTags"
 WH_URL="http://nr:8080/wh/qb"
 
 echo "
@@ -28,35 +30,54 @@ done
 # Split la string en array
 tags=($(echo $tags | tr "," " "))
 
-# Si le torrent a la categorie speciale pour les torrent de Michelle...
-if [ "${category[@]: -2}" = "_m" ]; then
-    tags+=("michelle") # Ajoute le nom de Michelle dans la liste des tags
-    [ $category == "movies_m" ] && category="movies"
-    [ $category == "tvshows_m" ] && category="tvshows"
+if [ $event == "added" ]; then
+    case "$category" in
+        movies|tvshows)
+            tags+=("francois") # Ajoute le nom de Michelle dans la liste des tags
+            ;;
+        movies_m)
+            tags+=("michelle") # Ajoute le nom de Michelle dans la liste des tags
+            category="movies"
+            ;;
+        tvshows_m)
+            tags+=("michelle") # Ajoute le nom de Michelle dans la liste des tags
+            category="tvshows"
+            ;;
+        movies_ari)
+            tags+=("arianne") # Ajoute le nom de Arianne dans la liste des tags
+            category="movies"
+            ;;
+        tvshows_ari)
+            tags+=("arianne") # Ajoute le nom de Arianne dans la liste des tags
+            category="tvshows"
+            ;;
+        *)
+            exit # Si ce n'est pas l'une des categories attendues, quitte
+            ;;
+    esac
 
     # Change la categorie du torrent dans qbittorrent
     error=$(
-        curl --silent \
-        --header "Content-Type: application/x-www-form-urlencoded" \
-        --data "category=${category}&hashes=${id}" \
-        http://localhost/api/v2/torrents/setCategory
+        curl \
+            --silent \
+            --header "Content-Type: application/x-www-form-urlencoded" \
+            --data "category=${category}&hashes=${id}" \
+            "${QB_setCategory}"
     )
     if [ $? -ne 0 ]; then
         echo "### Error: $error"
         exit 1
     fi
-fi
 
-if [ "$category" == "movies" ] || [ "$category" == "tvshows" ] && [ "$event" = "added" ]; then
     tags+=($category) # Ajoute la categorie dans la liste des tags
     tags_str=$(IFS=, ; echo "${tags[*]}") # Join le array en string avec des virgules
-
     # Change les tags du torrent dans qbittorrent
     error=$(
-        curl --silent \
-        --header "Content-Type: application/x-www-form-urlencoded" \
-        --data "tags=${tags_str}&hashes=${id}" \
-        $QB_URL/api/v2/torrents/addTags
+        curl \
+            --silent \
+            --header "Content-Type: application/x-www-form-urlencoded" \
+            --data "tags=${tags_str}&hashes=${id}" \
+            "${QB_addTags}"
     )
     if [ $? -ne 0 ]; then
         echo "### Error: $error"
@@ -85,10 +106,12 @@ echo "### JSON: ${json}"
 
 # Send the JSON to the webhook URL
 error=$(
-    curl --request POST --silent \
-    --header "Content-Type: application/json" \
-    --data "$json" \
-    $WH_URL
+    curl \
+        --silent \
+        --request POST \
+        --header "Content-Type: application/json" \
+        --data "$json" \
+        "$WH_URL"
 )
 if [ $? -ne 0 ]; then
     echo "### Error: $error"
