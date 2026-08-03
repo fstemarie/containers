@@ -1,6 +1,9 @@
-tskey.env
+*.env
 screenshots
-iot/mosquitto/passwd
-iot/appdaemon/secrets.yaml
-headscale/config.yaml
-traefik/traefik/traefik.yml
+iot/appdaemon
+iot/nodered
+headscale/headscale
+pirateisland/qb
+pirateisland/radarr
+proxy/authelia
+proxy/Caddyfile.d
