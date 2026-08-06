@@ -1,16 +1,16 @@
 ---
 
 x-filebox-hosts: &filebox-hosts
-  homeassistant: 192.168.0.129
-  qbp: 192.168.0.130
-  radarrp: 192.168.0.131
-  sonarrp: 192.168.0.132
-  lidarr: 192.168.0.133
-  prowlarr: 192.168.0.134
-  byparrp: 192.168.0.135
-  tautulli: 192.168.0.136
-  seerrp: 192.168.0.137
-  fileflows: 192.168.0.138
+  homeassistant.phil: 192.168.0.129
+  qb.phil: 192.168.0.130
+  radarr.phil: 192.168.0.131
+  sonarr.phil: 192.168.0.132
+  lidarr.phil: 192.168.0.133
+  prowlarr.phil: 192.168.0.134
+  byparr.phil: 192.168.0.135
+  tautulli.phil: 192.168.0.136
+  seerr.phil: 192.168.0.137
+  fileflows.phil: 192.168.0.138
 
 networks:
   lagoon:
@@ -19,6 +19,7 @@ networks:
     external: true
 
 volumes:
+  ts:
   caddy_data:
   caddy_config:
 
@@ -27,13 +28,39 @@ services:
     image: serfriz/caddy-duckdns:latest
     container_name: caddy
     entrypoint: caddy run --config /etc/caddy/Caddyfile --adapter caddyfile --watch
-    cap_add:
-      - NET_ADMIN
     volumes:
       - /l/containers/caddy/config:/etc/caddy
       - /l/containers/caddy/log:/var/log/caddy
       - caddy_config:/config
       - caddy_data:/data
+    network_mode: service:caddy_ts
+    restart: unless-stopped
+    labels:
+      - falarie.groupby=proxy
+
+  caddy_ts:
+    image: tailscale/tailscale:latest
+    container_name: caddy_ts
+    cap_add:
+      - NET_ADMIN
+    env_file: headscale.env
+    environment:
+      - TS_HOSTNAME=caddy
+      - TS_ACCEPT_DNS=true
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_EXTRA_ARGS=--login-server=https://falarie.duckdns.org
+      - TS_ENABLE_HEALTH_CHECK=true              # Enable healthcheck endpoint: "/healthz"
+      - TS_LOCAL_ADDR_PORT=127.0.0.1:41234       # The <addr>:<port> for the healthz endpoint
+      # - TS_TAILSCALED_EXTRA_ARGS=
+      # - TS_AUTHKEY=
+      # - TS_AUTH_ONCE=
+      # - TS_DEST_IP=
+      # - TS_ROUTES=
+      # - TS_SERVE_CONFIG=
+    volumes:
+      - ts:/var/lib/tailscale
+    devices:
+      - /dev/net/tun:/dev/net/tun
     networks:
       lagoon:
       greygoose:
@@ -43,6 +70,12 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    healthcheck:
+      test: wget --spider -q http://127.0.0.1:41234/healthz
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
     labels:
       - falarie.groupby=proxy
