@@ -1,1 +1,0 @@
-/data/containers/nodered/settings.js
