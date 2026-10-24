@@ -36,3 +36,16 @@ services:
     restart: unless-stopped
     labels:
       falarie.groupby: headscale
+
+  authelia:
+    image: authelia/authelia:latest
+    container_name: authelia
+    environment:
+      - TZ=America/Montreal
+    volumes:
+      - /l/containers/authelia:/config
+    networks:
+      lagoon:
+    restart: 'unless-stopped'
+    labels:
+      - falarie.groupby=headscale
