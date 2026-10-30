@@ -12,9 +12,9 @@ services:
     container_name: qb
     privileged: true
     environment:
+      - TZ=America/Montreal
       - PUID=897
       - PGID=899
-      - TZ=America/Montreal
       - UMASK=022
       - WEBUI_PORT=80
       - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
@@ -28,7 +28,8 @@ services:
     networks:
       lagoon:
       greygoose:
-        ipv4_address: 192.168.0.2
+    dns:
+      - 192.168.0.2
     healthcheck:
       test: curl --fail http://127.0.0.1/api/v2/app/version
       interval: 30s
@@ -37,7 +38,10 @@ services:
       start_period: 10s
     restart: unless-stopped
     labels:
-      - falarie.groupby=pirateisland
+      falarie.groupby: pirateisland
+      greygoose.hostname: qb_f
+      tsdproxy.enable: true
+      tsdproxy.port.1: "443/https:80/http"
 
   radarr:
     image: lscr.io/linuxserver/radarr
@@ -45,9 +49,9 @@ services:
     privileged: true
     env_file: apikeys.env
     environment:
+      - TZ=America/Montreal
       - PUID=896
       - PGID=899
-      - TZ=America/Montreal
       - UMASK=022 #optional
       - DOCKER_MODS=linuxserver/mods:radarr-striptracks
       - STRIPTRACKS_ARGS=--audio :eng:fre --subs :eng:fre
@@ -59,7 +63,8 @@ services:
     networks:
       lagoon:
       greygoose:
-        ipv4_address: 192.168.0.3
+    dns:
+      - 192.168.0.2
     healthcheck:
       test: curl --fail http://127.0.0.1/api/v3/health?apikey=$$RADARR_APIKEY
       interval: 30s
@@ -68,7 +73,10 @@ services:
       start_period: 10s
     restart: unless-stopped
     labels:
-      - falarie.groupby=pirateisland
+      falarie.groupby: pirateisland
+      greygoose.hostname: radarr_f
+      tsdproxy.enable: true
+      tsdproxy.port.1: "443/https:80/http"
 
   sonarr:
     image: lscr.io/linuxserver/sonarr
@@ -76,9 +84,9 @@ services:
     privileged: true
     env_file: apikeys.env
     environment:
+      - TZ=America/Montreal
       - PUID=895
       - PGID=899
-      - TZ=America/Montreal
       - UMASK=022 #optional
       - DOCKER_MODS=linuxserver/mods:radarr-striptracks
       - STRIPTRACKS_ARGS=--audio :eng:fre --subs :eng:fre
@@ -89,7 +97,8 @@ services:
     networks:
       lagoon:
       greygoose:
-        ipv4_address: 192.168.0.4
+    dns:
+      - 192.168.0.2
     healthcheck:
       test: curl --fail http://127.0.0.1/api/v3/health?apikey=$$SONARR_APIKEY
       interval: 30s
@@ -98,15 +107,18 @@ services:
       start_period: 10s
     restart: unless-stopped
     labels:
-      - falarie.groupby=pirateisland
+      falarie.groupby: pirateisland
+      greygoose.hostname: sonarr_f
+      tsdproxy.enable: true
+      tsdproxy.port.1: "443/https:80/http"
 
   jackett:
     image: lscr.io/linuxserver/jackett
     container_name: jackett
     environment:
-      - PUI=894
-      - PGID=894
       - TZ=America/Montreal
+      - PUID=894
+      - PGID=899
       - AUTO_UPDATE=true
     volumes:
       - /l/containers/jackett:/config
@@ -114,7 +126,8 @@ services:
     networks:
       lagoon:
       greygoose:
-        ipv4_address: 192.168.0.5
+    dns:
+      - 192.168.0.2
     healthcheck:
       test: curl --fail http://127.0.0.1/UI/Dashboard
       interval: 30s
@@ -123,7 +136,68 @@ services:
       start_period: 10s
     restart: unless-stopped
     labels:
-      - falarie.groupby=pirateisland
+      falarie.groupby: pirateisland
+      tsdproxy.enable: true
+      tsdproxy.port.1: "443/https:80/http"
+
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
+    container_name: seerr
+    user: "1000:100"
+    environment:
+      - TZ=America/Montreal
+      - LOG_LEVEL=info
+      - PORT=80 #optional
+    volumes:
+      - /l/containers/seerr:/app/config
+    networks:
+      lagoon:
+      greygoose:
+    dns:
+      - 192.168.0.2
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://127.0.0.1/api/v1/settings/public || exit 1
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 10s
+    restart: unless-stopped
+    labels:
+      falarie.groupby: pirateisland
+      greygoose.hostname: seerr_f
+      tsdproxy.enable: true
+      tsdproxy.port.1: "443/https:80/http"
+
+  cleanuparr:
+    image: ghcr.io/cleanuparr/cleanuparr:latest
+    container_name: cleanuparr
+    volumes:
+      - /data/containers/cleanuparr:/config
+      - /d/emerald:/emerald
+      - /d/ruby:/ruby
+    environment:
+      - PUID=892
+      - PGID=899
+      - PORT=80
+    #   - BASE_PATH=
+      - UMASK=022
+      - TZ=America/Montreal
+    networks:
+      lagoon:
+      greygoose:
+    # Health check configuration
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1/health"]
+      interval: 30s        # Check every 30 seconds
+      timeout: 10s         # Allow up to 10 seconds for response
+      start_period: 30s    # Wait 30 seconds before first check
+      retries: 3           # Mark unhealthy after 3 consecutive failures
+    restart: unless-stopped
+    labels:
+      falarie.groupby: pirateisland
+      tsdproxy.enable: true
+      tsdproxy.port.1: "443/https:80/http"
 
   byparr: # Port 8191
     image: ghcr.io/thephaseless/byparr:latest
@@ -142,29 +216,4 @@ services:
       timeout: 10s
     restart: unless-stopped
     labels:
-      - falarie.groupby=pirateisland
-
-  seerr:
-    image: ghcr.io/seerr-team/seerr:latest
-    init: true
-    container_name: seerr
-    user: "1000:100"
-    environment:
-      - LOG_LEVEL=info
-      - TZ=America/Montreal
-      - PORT=80 #optional
-    volumes:
-      - /l/containers/seerr:/app/config
-    networks:
-      lagoon:
-      greygoose:
-        ipv4_address: 192.168.0.6
-    healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost/api/v1/settings/public || exit 1
-      interval: 30s
-      retries: 3
-      start_period: 10s
-      timeout: 10s
-    restart: unless-stopped
-    labels:
-      - falarie.groupby=pirateisland
+      falarie.groupby: pirateisland

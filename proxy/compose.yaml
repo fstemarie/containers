@@ -1,17 +1,5 @@
 ---
 
-x-filebox-hosts: &filebox-hosts
-  homeassistant.phil: 192.168.0.129
-  qb.phil: 192.168.0.130
-  radarr.phil: 192.168.0.131
-  sonarr.phil: 192.168.0.132
-  lidarr.phil: 192.168.0.133
-  prowlarr.phil: 192.168.0.134
-  byparr.phil: 192.168.0.135
-  tautulli.phil: 192.168.0.136
-  seerr.phil: 192.168.0.137
-  fileflows.phil: 192.168.0.138
-
 networks:
   lagoon:
     external: true
@@ -19,76 +7,58 @@ networks:
     external: true
 
 volumes:
-  ts:
   caddy_data:
   caddy_config:
+  tsdproxy_ts:
 
 services:
   caddy:
     image: serfriz/caddy-duckdns:latest
     container_name: caddy
     entrypoint: caddy run --config /etc/caddy/Caddyfile --adapter caddyfile --watch
+    environment:
+      - CADDY_ADMIN:2019
     volumes:
       - /l/containers/caddy/config:/etc/caddy
       - /l/containers/caddy/log:/var/log/caddy
       - caddy_config:/config
       - caddy_data:/data
-    network_mode: service:caddy_ts
-    restart: unless-stopped
-    labels:
-      - falarie.groupby=proxy
-
-  caddy_ts:
-    image: tailscale/tailscale:latest
-    container_name: caddy_ts
-    cap_add:
-      - NET_ADMIN
-    env_file: headscale.env
-    environment:
-      - TS_HOSTNAME=caddy
-      - TS_ACCEPT_DNS=true
-      - TS_STATE_DIR=/var/lib/tailscale
-      - TS_EXTRA_ARGS=--login-server=https://falarie.duckdns.org
-      - TS_ENABLE_HEALTH_CHECK=true              # Enable healthcheck endpoint: "/healthz"
-      - TS_LOCAL_ADDR_PORT=127.0.0.1:41234       # The <addr>:<port> for the healthz endpoint
-      # - TS_TAILSCALED_EXTRA_ARGS=
-      # - TS_AUTHKEY=
-      # - TS_AUTH_ONCE=
-      # - TS_DEST_IP=
-      # - TS_ROUTES=
-      # - TS_SERVE_CONFIG=
-    volumes:
-      - ts:/var/lib/tailscale
-    devices:
-      - /dev/net/tun:/dev/net/tun
     networks:
       lagoon:
-      greygoose:
-        ipv4_address: 192.168.0.1
-    extra_hosts:
-      <<: *filebox-hosts
     ports:
       - "80:80"
       - "443:443"
     healthcheck:
-      test: wget --spider -q http://127.0.0.1:41234/healthz
-      interval: 1m
-      timeout: 10s
+      test: wget --no-verbose --tries=1 --spider http://127.0.0.1:2019/config/
+      interval: 30s
+      timeout: 5s
       retries: 3
-      start_period: 10s
+      start_period: 5s
     restart: unless-stopped
     labels:
       - falarie.groupby=proxy
 
-  authelia:
-    image: authelia/authelia:latest
-    container_name: authelia
-    environment:
-      - TZ=America/Montreal
+  tsdproxy:
+    image: almeidapaulopt/tsdproxy
+    container_name: tsdproxy
     volumes:
-      - /l/containers/authelia:/config
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /data/containers/tsdproxy:/config
+      - tsdproxy_ts:/data
     networks:
       lagoon:
-    restart: 'unless-stopped'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "/healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
     labels:
-      - falarie.groupby=proxy
+      falarie.groupby: proxy
+      tsdproxy.enable: "true"
+      tsdproxy.name: "dash"
+      tsdproxy.dash.visible: "true"
+      tsdproxy.port.1: "443/https:8080/http"
