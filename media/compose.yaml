@@ -14,9 +14,9 @@ services:
       - "105" # render
     environment:
       - PUID=898 # jellyfin
-      - PGID=898
+      - PGID=899
       - TZ=America/Toronto
-      - JELLYFIN_PublishedServerUrl=jellyfin
+      - JELLYFIN_PublishedServerUrl=http://10.0.1.65
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=all
     tmpfs:
@@ -25,7 +25,7 @@ services:
       - /l/containers/jellyfin:/config
       - /l/backup/sklad/jellyfin:/config/data/data/backups
       - /d/emerald:/emerald
-      - /d/ruby:/ruby
+      - /d/ruby/audio/files:/audio
     devices:
       - /dev/dri:/dev/drisudo /etc/init.d/
       - /dev/nvidia0:/dev/nvidia0
@@ -36,6 +36,7 @@ services:
       ocean:
         ipv4_address: 10.0.1.65
     # ports:
+    #   - "8096:8096/tcp"
     #   - "7359:7359/udp"
     #   - "1900:1900/udp"
     deploy:   # this section is for NVIDIA support in newer docker-compose
@@ -53,4 +54,6 @@ services:
       start_period: 10s
     restart: unless-stopped
     labels:
-      - falarie.groupby=media
+      falarie.groupby: media
+      tsdproxy.enable: true
+      tsdproxy.port.1: "443/https:80/http"
