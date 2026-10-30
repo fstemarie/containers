@@ -1,0 +1,27 @@
+---
+
+networks:
+  lagoon:
+    external: true
+  greygoose:
+    external: true
+
+services:
+  dns:
+    build: files
+    container_name: dns
+    environment:
+      REMOTE_DOCKER: "tcp://192.168.0.128:2375"
+    networks:
+      lagoon:
+      greygoose:
+        ipv4_address: 192.168.0.2
+    extra_hosts:
+      filebox: 192.168.0.128
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./files/greygoose.ssh.key:/root/.ssh/greygoose.ssh.key
+      - ./files/config:/root/.ssh/config
+    restart: unless-stopped
+    labels:
+      falarie.groupby: greygoose
